@@ -1,0 +1,33 @@
+{
+  "name": "@repo/auth",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./middleware": "./src/middleware.ts",
+    "./client": "./src/client.ts",
+    "./env": "./env.ts"
+  },
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "@t3-oss/env-nextjs": "^0.13.8",
+    "better-auth": "^1.2.12",
+    "next": "15.3.4",
+    "next-themes": "^0.4.6",
+    "react": "19.1.0",
+    "server-only": "^0.0.1",
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^24.0.10",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "typescript": "^5.8.3"
+  }
+}

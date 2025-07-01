@@ -1,0 +1,38 @@
+{
+  "folders": [
+    {
+      "name": "Next.js",
+      "path": "../apps/nextjs"
+    },
+    {
+      "name": "FastAPI",
+      "path": "../apps/fastapi"
+    },
+    {
+      "name": "Root",
+      "path": "../"
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "joshx.workspace-terminals",
+      "teticio.python-envy",
+      "charliermarsh.ruff"
+    ]
+  },
+  "settings": {
+    "search.useIgnoreFiles": true,
+    "search.useParentIgnoreFiles": true,
+    "typescript.tsdk": "Root/node_modules/typescript/lib"
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [],
+    "compounds": [
+      {
+        "name": "Launch Next.js and FastAPI",
+        "configurations": ["Debug Next.js", "Debug FastAPI"]
+      }
+    ]
+  }
+}
