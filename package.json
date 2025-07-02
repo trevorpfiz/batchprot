@@ -21,11 +21,13 @@
     "db:pull": "turbo -F @repo/database pull",
     "db:push": "turbo -F @repo/database push",
     "db:studio": "turbo -F @repo/database studio",
-    "dev": "turbo dev",
+    "deploy": "sst deploy --stage production",
+    "dev": "sst dev",
     "format": "ultracite format",
     "lint": "ultracite lint",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
+    "start:db": "./start-database.sh",
     "test": "turbo test"
   },
   "devDependencies": {

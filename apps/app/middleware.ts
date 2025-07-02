@@ -1,19 +1,4 @@
-import { authMiddleware } from '@repo/auth/middleware';
-import {
-  noseconeMiddleware,
-  noseconeOptions,
-  noseconeOptionsWithToolbar,
-} from '@repo/security/middleware';
-import type { NextMiddleware } from 'next/server';
-import { env } from './env';
-
-const securityHeaders = env.FLAGS_SECRET
-  ? noseconeMiddleware(noseconeOptionsWithToolbar)
-  : noseconeMiddleware(noseconeOptions);
-
-export default authMiddleware(() =>
-  securityHeaders()
-) as unknown as NextMiddleware;
+import { type NextRequest, NextResponse } from 'next/server';
 
 export const config = {
   matcher: [
@@ -23,3 +8,7 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
+
+export function middleware(_request: NextRequest) {
+  return NextResponse.next();
+}

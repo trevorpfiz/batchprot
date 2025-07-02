@@ -2,7 +2,7 @@ import type { Config } from 'drizzle-kit';
 import { Resource } from 'sst';
 
 export default {
-  schema: './src/schema',
+  schema: './src/schema.ts',
   dialect: 'postgresql',
   out: './migrations',
   dbCredentials: {

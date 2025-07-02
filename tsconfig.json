@@ -8,11 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "incremental": false,
     "isolatedModules": true,
-    "lib": [
-      "es2022",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["es2022", "DOM", "DOM.Iterable"],
     "module": "NodeNext",
     "moduleDetection": "force",
     "moduleResolution": "NodeNext",
@@ -21,5 +17,7 @@
     "strict": true,
     "target": "ES2022",
     "strictNullChecks": true
-  }
+  },
+  "include": ["infra", "sst-env.d.ts", "sst.config.ts"],
+  "exclude": ["node_modules", "dist"]
 }

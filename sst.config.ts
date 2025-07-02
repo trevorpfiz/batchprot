@@ -62,20 +62,27 @@ export default $config({
       removal: input?.stage === 'production' ? 'retain' : 'remove',
       protect: ['production'].includes(input?.stage),
       home: 'aws',
+      providers: {
+        aws: {
+          region: 'us-east-2',
+          profile: input.stage === 'production' ? 'mfa' : 'mfa',
+        },
+      },
     };
   },
   async run() {
-    const vpc = new sst.aws.Vpc('MyVpc', { nat: 'ec2' });
+    // Global infra
 
-    const _rds = new sst.aws.Postgres('MyPostgres', {
-      dev: {
-        username: 'postgres',
-        password: 'password',
-        database: 'local',
-        host: 'localhost',
-        port: 5432,
-      },
-      vpc,
-    });
+    // Infra in VPC
+    const { vpc } = await import('./infra/vpc.js');
+    const { rds } = await import('./infra/rds.js');
+    const { web } = await import('./infra/web.js');
+    const { studio } = await import('./infra/studio.js');
+    const { api } = await import('./infra/api.js');
+
+    return {
+      webUrl: web.url,
+      apiUrl: api.url,
+    };
   },
 });

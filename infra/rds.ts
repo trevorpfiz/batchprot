@@ -1,4 +1,4 @@
-import { vpc } from './vpc';
+import { vpc } from './vpc.js';
 
 export const rds = new sst.aws.Postgres('MyPostgres', {
   // https://sst.dev/docs/examples/#aws-postgres-local

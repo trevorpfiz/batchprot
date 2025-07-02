@@ -1,12 +1,12 @@
 {
   "folders": [
     {
-      "name": "Next.js",
-      "path": "../apps/nextjs"
+      "name": "FastAPI",
+      "path": "../functions/fastapi"
     },
     {
-      "name": "FastAPI",
-      "path": "../apps/fastapi"
+      "name": "Next.js",
+      "path": "../apps/app"
     },
     {
       "name": "Root",
@@ -30,8 +30,8 @@
     "configurations": [],
     "compounds": [
       {
-        "name": "Launch Next.js and FastAPI",
-        "configurations": ["Debug Next.js", "Debug FastAPI"]
+        "name": "Launch FastAPI and Next.js",
+        "configurations": ["Debug FastAPI", "Debug Next.js"]
       }
     ]
   }

@@ -13,12 +13,12 @@ const RootLayout = ({ children }: RootLayoutProperties) => (
   <html className={fonts} lang="en" suppressHydrationWarning>
     <body>
       <DesignSystemProvider
-        helpUrl={env.NEXT_PUBLIC_DOCS_URL}
+        helpUrl={env.NEXT_PUBLIC_APP_URL}
         privacyUrl={new URL(
           '/legal/privacy',
-          env.NEXT_PUBLIC_WEB_URL
+          env.NEXT_PUBLIC_APP_URL
         ).toString()}
-        termsUrl={new URL('/legal/terms', env.NEXT_PUBLIC_WEB_URL).toString()}
+        termsUrl={new URL('/legal/terms', env.NEXT_PUBLIC_APP_URL).toString()}
       >
         {children}
       </DesignSystemProvider>
