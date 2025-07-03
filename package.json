@@ -16,7 +16,7 @@
     "bump-ui": "npx shadcn@latest add --all --overwrite -c packages/design-system",
     "clean": "git clean -xdf node_modules",
     "clean:workspaces": "turbo run clean",
-    "db:generate": "pnpm -F @repo/database dk:generate",
+    "db:generate": "turbo -F @repo/database dk:generate",
     "db:migrate": "turbo -F @repo/database migrate",
     "db:pull": "turbo -F @repo/database pull",
     "db:push": "turbo -F @repo/database push",
