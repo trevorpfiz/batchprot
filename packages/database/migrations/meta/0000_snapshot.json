@@ -93,12 +93,8 @@
           "name": "prot_account_user_id_prot_user_id_fk",
           "tableFrom": "prot_account",
           "tableTo": "prot_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -168,12 +164,8 @@
           "name": "prot_session_user_id_prot_user_id_fk",
           "tableFrom": "prot_session",
           "tableTo": "prot_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -183,9 +175,7 @@
         "prot_session_token_unique": {
           "name": "prot_session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       },
       "policies": {},
@@ -246,9 +236,7 @@
         "prot_user_email_unique": {
           "name": "prot_user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       },
       "policies": {},
@@ -384,12 +372,8 @@
           "name": "prot_job_user_id_prot_user_id_fk",
           "tableFrom": "prot_job",
           "tableTo": "prot_user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -589,12 +573,8 @@
           "name": "prot_protein_analysis_job_id_prot_job_id_fk",
           "tableFrom": "prot_protein_analysis",
           "tableTo": "prot_job",
-          "columnsFrom": [
-            "job_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["job_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -610,12 +590,7 @@
     "public.job_status": {
       "name": "job_status",
       "schema": "public",
-      "values": [
-        "queued",
-        "running",
-        "succeeded",
-        "failed"
-      ]
+      "values": ["queued", "running", "succeeded", "failed"]
     }
   },
   "schemas": {},

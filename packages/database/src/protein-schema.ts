@@ -169,6 +169,8 @@ export const ProteinAnalysisFilterSchema = z
 // Types for API - using direct infer types
 export type Job = typeof Job.$inferSelect;
 export type NewJob = typeof Job.$inferInsert;
+export type NewJobParams = z.infer<typeof insertJobParams>;
+export type UpdateJobParams = z.infer<typeof updateJobSchema>;
 export type JobId = Job['id'];
 export type JobStatus = (typeof jobStatus.enumValues)[number];
 

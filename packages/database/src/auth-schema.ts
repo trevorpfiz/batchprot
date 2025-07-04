@@ -1,4 +1,4 @@
-import { createTable } from '~/src/_table';
+import { createTable } from './_table';
 
 export const user = createTable('user', (t) => ({
   id: t.text().primaryKey(),
@@ -51,3 +51,8 @@ export const verification = createTable('verification', (t) => ({
   createdAt: t.timestamp(),
   updatedAt: t.timestamp(),
 }));
+
+// Types for API
+export type User = typeof user.$inferSelect;
+export type NewUser = typeof user.$inferInsert;
+export type UserId = User['id'];

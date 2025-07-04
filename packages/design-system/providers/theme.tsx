@@ -15,3 +15,5 @@ export const ThemeProvider = ({
     {children}
   </NextThemeProvider>
 );
+
+export { useTheme } from 'next-themes';

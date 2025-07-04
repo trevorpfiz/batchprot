@@ -2,6 +2,21 @@
   "name": "@repo/seo",
   "version": "0.0.0",
   "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./json-ld": {
+      "types": "./dist/json-ld.d.ts",
+      "default": "./src/json-ld.tsx"
+    },
+    "./metadata": {
+      "types": "./dist/metadata.d.ts",
+      "default": "./src/metadata.ts"
+    }
+  },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
     "typecheck": "tsc --noEmit --emitDeclarationOnly false"
@@ -17,6 +32,6 @@
     "@types/node": "^24.0.10",
     "@types/react": "19.1.8",
     "@types/react-dom": "19.1.6",
-    "next": "15.3.4"
+    "next": "15.3.5"
   }
 }

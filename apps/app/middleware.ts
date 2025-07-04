@@ -1,4 +1,7 @@
-import { type NextRequest, NextResponse } from 'next/server';
+import { authMiddleware } from '@repo/auth/middleware';
+import type { NextMiddleware } from 'next/server';
+
+export default authMiddleware as unknown as NextMiddleware;
 
 export const config = {
   matcher: [
@@ -8,7 +11,3 @@ export const config = {
     '/(api|trpc)(.*)',
   ],
 };
-
-export function middleware(_request: NextRequest) {
-  return NextResponse.next();
-}

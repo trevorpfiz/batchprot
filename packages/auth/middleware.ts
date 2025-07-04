@@ -2,7 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
 const isProtectedRoute = (request: NextRequest) => {
-  return request.url.startsWith('/dashboard'); // change this to your protected route
+  return request.url.startsWith('/'); // change this to your protected route
 };
 
 export const authMiddleware = async (request: NextRequest) => {

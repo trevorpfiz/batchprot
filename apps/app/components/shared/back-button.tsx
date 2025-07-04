@@ -1,0 +1,32 @@
+'use client';
+
+import { Button } from '@repo/design-system/components/ui/button';
+import { ChevronLeftIcon } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+export function useBackPath(currentResource: string) {
+  const pathname = usePathname();
+  const segmentCount = pathname.slice(1).split('/');
+  const backPath =
+    segmentCount.length > 2
+      ? pathname.slice(0, pathname.indexOf(currentResource) - 1)
+      : pathname.slice(0, pathname.indexOf(segmentCount[1]));
+  return backPath;
+}
+
+export function BackButton({
+  currentResource,
+}: {
+  /* must be in kebab-case */
+  currentResource: string;
+}) {
+  const backPath = useBackPath(currentResource);
+  return (
+    <Button asChild variant={'ghost'}>
+      <Link href={backPath}>
+        <ChevronLeftIcon size={16} strokeWidth={2} />
+      </Link>
+    </Button>
+  );
+}
