@@ -12,7 +12,7 @@ import { SettingsDialogStoreProvider } from '~/providers/settings-dialog-store-p
 import { HydrateClient, prefetch, trpc } from '~/trpc/server';
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  prefetch(trpc.job.all.queryOptions());
+  prefetch(trpc.job.byUser.queryOptions());
 
   const session = await getSession();
   const user = session?.user;
@@ -28,7 +28,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
           <AppSidebar />
           <SidebarInset className="h-dvh">
             {children}
-            <SettingsDialog userEmail={user?.email ?? ''} userId={user.id} />
+            <SettingsDialog />
           </SidebarInset>
         </SettingsDialogStoreProvider>
       </SidebarProvider>

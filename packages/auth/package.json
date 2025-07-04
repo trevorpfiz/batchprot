@@ -11,7 +11,8 @@
     "./provider": "./provider.tsx",
     "./components/sign-in": "./components/sign-in.tsx",
     "./components/sign-up": "./components/sign-up.tsx",
-    "./keys": "./keys.ts"
+    "./keys": "./keys.ts",
+    "./routes": "./routes.ts"
   },
   "scripts": {
     "clean": "git clean -xdf .cache .turbo dist node_modules",
@@ -21,7 +22,7 @@
     "@repo/database": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
     "better-auth": "^1.2.12",
-    "next": "15.3.5",
+    "next": "15.3.4",
     "next-themes": "^0.4.6",
     "react": "19.1.0",
     "server-only": "^0.0.1",

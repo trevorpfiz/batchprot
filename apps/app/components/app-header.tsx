@@ -2,7 +2,6 @@ import { Separator } from '@repo/design-system/components/ui/separator';
 import { SidebarTrigger } from '@repo/design-system/components/ui/sidebar';
 
 import { UserButtonWrapper } from '~/components/auth/user-button-wrapper';
-import { NavActions } from '~/components/sidebar/nav-actions';
 
 interface AppHeaderProps {
   isJobRoute?: boolean;
@@ -26,7 +25,7 @@ export function AppHeader(props: AppHeaderProps) {
 
       {isJobRoute && (
         <div className="flex items-center">
-          <NavActions />
+          <p>Actions</p>
         </div>
       )}
 
