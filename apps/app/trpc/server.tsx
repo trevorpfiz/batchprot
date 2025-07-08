@@ -30,7 +30,6 @@ export const trpc = createTRPCOptionsProxy<AppRouter>({
   ctx: createContext,
   queryClient: getQueryClient,
 });
-
 export function HydrateClient(props: { children: React.ReactNode }) {
   const queryClient = getQueryClient();
   return (

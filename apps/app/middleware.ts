@@ -36,8 +36,13 @@ export async function middleware(request: NextRequest) {
       }
     );
 
+    // biome-ignore lint/suspicious/noConsole: <explanation>
+    console.log('session', session);
+
     // If user is not authenticated and trying to access protected route
     if (!session && isProtectedRoute) {
+      // biome-ignore lint/suspicious/noConsole: <explanation>
+      console.log('redirecting to auth route');
       return NextResponse.redirect(new URL(DEFAULT_AUTH_ROUTE, request.url));
     }
 

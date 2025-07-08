@@ -15,6 +15,13 @@
       "when": 1751580975923,
       "tag": "0001_simple_abomination",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1751917372413,
+      "tag": "0002_ordinary_maverick",
+      "breakpoints": true
     }
   ]
 }

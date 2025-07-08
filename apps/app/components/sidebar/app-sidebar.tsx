@@ -47,8 +47,8 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
         <SidebarMenu className="h-8">
           <SidebarMenuItem>
             <div className="flex w-full items-center justify-between">
-              <div className="flex flex-col gap-0.5 pl-2 leading-none">
-                <Logo className="h-6 w-auto" href="/" />
+              <div className="flex items-center pl-2">
+                <Logo height={32} href="/" width={80} />
               </div>
 
               <Tooltip>

@@ -5,6 +5,7 @@ import {
 } from '@repo/design-system/components/ui/sidebar';
 
 import { AppHeader } from '~/components/app-header';
+import { UserButtonWrapper } from '~/components/auth/user-button-wrapper';
 import { AppSidebar } from '~/components/sidebar/app-sidebar';
 
 export default function Loading() {
@@ -12,7 +13,7 @@ export default function Loading() {
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <SidebarInset className="h-dvh">
-        <AppHeader />
+        <AppHeader userButton={<UserButtonWrapper />} />
         <div className="flex flex-1 items-center justify-center">
           <div className="flex flex-1 items-center justify-center overflow-hidden">
             <Spinner />

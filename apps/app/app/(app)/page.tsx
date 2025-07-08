@@ -1,9 +1,10 @@
 import { AppHeader } from '~/components/app-header';
+import { UserButtonWrapper } from '~/components/auth/user-button-wrapper';
 
-export default function Home() {
+export default function Page() {
   return (
     <>
-      <AppHeader />
+      <AppHeader userButton={<UserButtonWrapper />} />
       <div className="flex-1 overflow-auto">
         <main className="h-full">
           <div className="flex h-full flex-col items-center justify-center">

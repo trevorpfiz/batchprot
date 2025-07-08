@@ -59,10 +59,17 @@ export function NavJobs() {
         await queryClient.cancelQueries({
           queryKey: trpc.job.byUser.queryKey(),
         });
+        await queryClient.cancelQueries({
+          queryKey: trpc.job.byId.queryKey({ id: updatedJob.id }),
+        });
 
         const previousJobs = queryClient.getQueryData<
           RouterOutputs['job']['byUser']
         >(trpc.job.byUser.queryKey());
+
+        const previousJob = queryClient.getQueryData<
+          RouterOutputs['job']['byId']
+        >(trpc.job.byId.queryKey({ id: updatedJob.id }));
 
         queryClient.setQueryData(
           trpc.job.byUser.queryKey(),
@@ -81,20 +88,45 @@ export function NavJobs() {
           }
         );
 
+        queryClient.setQueryData(
+          trpc.job.byId.queryKey({ id: updatedJob.id }),
+          (old: RouterOutputs['job']['byId'] | undefined) => {
+            if (!old?.job) {
+              return old;
+            }
+            return {
+              ...old,
+              job: {
+                ...old.job,
+                title: updatedJob.title ?? old.job.title,
+              },
+            };
+          }
+        );
+
         setOpen(false);
-        return { previousJobs };
+        return { previousJobs, previousJob };
       },
-      onError: (_err, _newTodo, context) => {
+      onError: (_err, updatedJob, context) => {
         if (context?.previousJobs) {
           queryClient.setQueryData(
             trpc.job.byUser.queryKey(),
             context.previousJobs
           );
         }
+        if (context?.previousJob) {
+          queryClient.setQueryData(
+            trpc.job.byId.queryKey({ id: updatedJob.id }),
+            context.previousJob
+          );
+        }
       },
-      onSettled: () => {
+      onSettled: (_data, _error, updatedJob) => {
         queryClient.invalidateQueries({
           queryKey: trpc.job.byUser.queryKey(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: trpc.job.byId.queryKey({ id: updatedJob.id }),
         });
         setSelectedJob(null);
       },
@@ -153,59 +185,6 @@ export function NavJobs() {
                 </SidebarMenuButton>
               </PopoverAnchor>
 
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <SidebarMenuAction
-                    showOnHover={pathname !== `/job/${job.id}`}
-                  >
-                    <MoreHorizontal size={16} strokeWidth={2} />
-                    <span className="sr-only">Options</span>
-                  </SidebarMenuAction>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align={isMobile ? 'end' : 'start'}
-                  className="w-48"
-                  onCloseAutoFocus={(e) => {
-                    e.preventDefault();
-
-                    if (selectedJob) {
-                      setOpen(true);
-                    }
-                  }}
-                  side={isMobile ? 'bottom' : 'right'}
-                >
-                  <DropdownMenuItem
-                    onSelect={() => {
-                      setSelectedJob(job);
-                      setName(job.title);
-                    }}
-                  >
-                    <Pen size={16} strokeWidth={2} />
-                    <span>Rename</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="text-destructive focus:text-destructive"
-                    onSelect={() => {
-                      if (
-                        window.confirm(
-                          'Are you sure you want to delete this job? This action cannot be undone.'
-                        )
-                      ) {
-                        deleteMutation.mutate({ id: job.id });
-                      }
-                    }}
-                  >
-                    <Trash2
-                      aria-hidden="true"
-                      className="text-destructive"
-                      size={16}
-                      strokeWidth={2}
-                    />
-                    <span>Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
               <PopoverContent
                 align="start"
                 className="w-56 p-0.5"
@@ -224,7 +203,7 @@ export function NavJobs() {
                     />
                     <button
                       aria-label="Rename"
-                      className="inline-flex w-9 items-center justify-center rounded-e-lg border border-input bg-background text-muted-foreground/80 text-sm outline-offset-2 transition-colors hover:bg-accent hover:text-accent-foreground focus:z-10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
+                      className="inline-flex w-9 items-center justify-center rounded-e-lg border border-input bg-background text-muted-foreground/80 text-sm outline-offset-2 transition-colors hover:bg-accent hover:text-accent-foreground focus:z-10 focus-visible:outline-2 focus-visible:outline-ring/70 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
                       disabled={renameMutation.isPending || !name.trim()}
                       type="submit"
                     >
@@ -238,6 +217,59 @@ export function NavJobs() {
                 </form>
               </PopoverContent>
             </Popover>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuAction
+                  className="rounded-sm data-[state=open]:bg-accent"
+                  showOnHover={pathname !== `/job/${job.id}`}
+                >
+                  <MoreHorizontal size={16} strokeWidth={2} />
+                  <span className="sr-only">Options</span>
+                </SidebarMenuAction>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align={isMobile ? 'end' : 'start'}
+                className="w-48"
+                onCloseAutoFocus={(e) => {
+                  e.preventDefault();
+
+                  if (selectedJob) {
+                    setOpen(true);
+                  }
+                }}
+                side={isMobile ? 'bottom' : 'right'}
+              >
+                <DropdownMenuItem
+                  onSelect={() => {
+                    setSelectedJob(job);
+                    setName(job.title);
+                  }}
+                >
+                  <Pen size={16} strokeWidth={2} />
+                  <span>Rename</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive focus:text-destructive"
+                  onSelect={() => {
+                    if (
+                      window.confirm(
+                        'Are you sure you want to delete this job? This action cannot be undone.'
+                      )
+                    ) {
+                      deleteMutation.mutate({ id: job.id });
+                    }
+                  }}
+                >
+                  <Trash2
+                    aria-hidden="true"
+                    className="text-destructive"
+                    size={16}
+                    strokeWidth={2}
+                  />
+                  <span>Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </SidebarMenuItem>
         ))}
       </SidebarMenu>

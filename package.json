@@ -39,11 +39,11 @@
     "@types/node": "^24.0.10",
     "commander": "^14.0.0",
     "husky": "^9.1.7",
-    "sst": "3.17.8",
+    "sst": "3.17.10",
     "tsup": "^8.5.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "ultracite": "^5.0.31",
+    "ultracite": "^5.0.32",
     "vitest": "^3.2.4"
   }
 }

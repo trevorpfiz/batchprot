@@ -52,6 +52,13 @@ export const verification = createTable('verification', (t) => ({
   updatedAt: t.timestamp(),
 }));
 
+export const jwks = createTable('jwks', (t) => ({
+  id: t.text().primaryKey(),
+  publicKey: t.text().notNull(),
+  privateKey: t.text().notNull(),
+  createdAt: t.timestamp().notNull(),
+}));
+
 // Types for API
 export type User = typeof user.$inferSelect;
 export type NewUser = typeof user.$inferInsert;
