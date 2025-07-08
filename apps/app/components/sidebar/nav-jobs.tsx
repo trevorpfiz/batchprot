@@ -6,6 +6,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@repo/design-system/components/ui/dropdown-menu';
 import { Input } from '@repo/design-system/components/ui/input';
@@ -248,8 +249,8 @@ export function NavJobs() {
                   <Pen size={16} strokeWidth={2} />
                   <span>Rename</span>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  className="text-destructive focus:text-destructive"
                   onSelect={() => {
                     if (
                       window.confirm(
@@ -259,13 +260,9 @@ export function NavJobs() {
                       deleteMutation.mutate({ id: job.id });
                     }
                   }}
+                  variant="destructive"
                 >
-                  <Trash2
-                    aria-hidden="true"
-                    className="text-destructive"
-                    size={16}
-                    strokeWidth={2}
-                  />
+                  <Trash2 aria-hidden="true" size={16} strokeWidth={2} />
                   <span>Delete</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

@@ -33,58 +33,54 @@ export function SettingsDialog() {
       onOpenChange={(open) => !open && closeSettingsDialog()}
       open={isOpen}
     >
-      <DialogContent className="flex min-h-96 flex-col gap-0 p-0 sm:max-h-[min(640px,80vh)] sm:max-w-2xl [&>button:last-child]:top-3.5">
-        <DialogHeader className="contents space-y-0 text-left">
-          <DialogTitle className="border-border border-b px-6 py-4 text-lg">
-            Settings
-          </DialogTitle>
-          <DialogDescription className="hidden">
+      <DialogContent className="flex h-[42rem] min-h-96 flex-col gap-0 p-0 sm:max-h-[min(640px,80vh)] sm:max-w-3xl [&>button:last-child]:top-3.5">
+        <DialogHeader className="border-border border-b px-6 py-4">
+          <DialogTitle>Settings</DialogTitle>
+          <DialogDescription>
             Make changes to your settings here.
           </DialogDescription>
-
-          <div className="overflow-y-auto">
-            <div className="p-0">
-              <Tabs
-                className="flex w-full gap-6"
-                defaultValue="general"
-                orientation="vertical"
-              >
-                <TabsList className="min-w-44 flex-col justify-start gap-2 bg-transparent p-4">
-                  <TabsTrigger
-                    className="w-full justify-start text-foreground hover:bg-muted hover:text-foreground data-[state=active]:bg-muted data-[state=active]:shadow-none"
-                    value="general"
-                  >
-                    <Settings
-                      aria-hidden="true"
-                      className="-ms-0.5 me-1.5 opacity-60"
-                      size={16}
-                      strokeWidth={2}
-                    />
-                    General
-                  </TabsTrigger>
-                  <TabsTrigger
-                    className="w-full justify-start text-foreground hover:bg-muted hover:text-foreground data-[state=active]:bg-muted data-[state=active]:shadow-none"
-                    value="account"
-                  >
-                    <User
-                      aria-hidden="true"
-                      className="-ms-0.5 me-1.5 opacity-60"
-                      size={16}
-                      strokeWidth={2}
-                    />
-                    Account
-                  </TabsTrigger>
-                </TabsList>
-                <div className="grow text-start">
-                  <TabsContent className="m-0" value="general">
-                    <GeneralTab />
-                  </TabsContent>
-                  <TabsContent className="m-0" value="account" />
-                </div>
-              </Tabs>
-            </div>
-          </div>
         </DialogHeader>
+
+        <div className="grow overflow-y-auto">
+          <Tabs
+            className="flex flex-row gap-8 p-6"
+            defaultValue="general"
+            orientation="vertical"
+          >
+            <TabsList className="min-w-44 flex-col items-start justify-start bg-transparent p-0">
+              <TabsTrigger
+                className="w-full justify-start font-medium text-base text-foreground hover:bg-muted hover:text-foreground data-[state=active]:bg-muted data-[state=active]:shadow-none"
+                value="general"
+              >
+                <Settings
+                  aria-hidden="true"
+                  className="-ms-0.5 me-2 opacity-60"
+                  size={20}
+                  strokeWidth={2}
+                />
+                General
+              </TabsTrigger>
+              <TabsTrigger
+                className="w-full justify-start font-medium text-base text-foreground hover:bg-muted hover:text-foreground data-[state=active]:bg-muted data-[state=active]:shadow-none"
+                value="account"
+              >
+                <User
+                  aria-hidden="true"
+                  className="-ms-0.5 me-2 opacity-60"
+                  size={20}
+                  strokeWidth={2}
+                />
+                Account
+              </TabsTrigger>
+            </TabsList>
+            <div className="grow p-0 text-start">
+              <TabsContent className="m-0" value="general">
+                <GeneralTab />
+              </TabsContent>
+              <TabsContent className="m-0" value="account" />
+            </div>
+          </Tabs>
+        </div>
       </DialogContent>
     </Dialog>
   );

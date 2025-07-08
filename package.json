@@ -31,7 +31,7 @@
     "test": "turbo test"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.0.6",
+    "@biomejs/biome": "2.1.1",
     "@clack/prompts": "^0.11.0",
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.4",

@@ -9,7 +9,7 @@ export const api = new sst.aws.Function('BatchProtAPI', {
   python: {
     container: true,
   },
-  handler: './functions/src/functions/api.handler',
+  handler: './functions/src/functions/main.handler',
   runtime: 'python3.12',
   timeout: '30 seconds',
   memory: '1024 MB',
