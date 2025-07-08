@@ -12,7 +12,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/",
+    "",
     response_model=ProteinAnalysisResponse,
     status_code=status.HTTP_200_OK,
     responses={

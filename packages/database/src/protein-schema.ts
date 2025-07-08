@@ -25,7 +25,7 @@ export const Job = createTable(
       .references(() => user.id, { onDelete: 'cascade' }),
     title: t.varchar({ length: 256 }).notNull(),
     status: jobStatus('job_status').default('queued').notNull(),
-    algorithm: t.varchar({ length: 64 }).default('biopython-1.76'),
+    algorithm: t.varchar({ length: 64 }).default('biopython-1.85'),
 
     createdAt: t.timestamp().defaultNow().notNull(),
     updatedAt: t

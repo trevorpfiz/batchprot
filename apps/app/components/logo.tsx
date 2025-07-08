@@ -10,17 +10,25 @@ export const Logo = ({
   height = 72,
   className,
   variant = 'default',
+  priority = false,
 }: {
   href?: string;
   width?: number;
   height?: number;
   className?: string;
   variant?: 'default' | 'white';
+  priority?: boolean;
 }) => {
   if (variant === 'white') {
     return (
       <Link className={className} href={href}>
-        <Image alt="Logo" height={height} src="/logo-white.svg" width={width} />
+        <Image
+          alt="Logo"
+          height={height}
+          priority={priority}
+          src="/logo-white.svg"
+          width={width}
+        />
       </Link>
     );
   }
@@ -31,6 +39,7 @@ export const Logo = ({
         alt="Logo"
         className="block dark:hidden"
         height={height}
+        priority={priority}
         src="/logo.svg"
         width={width}
       />
@@ -38,6 +47,7 @@ export const Logo = ({
         alt="Logo"
         className="hidden dark:block"
         height={height}
+        priority={priority}
         src="/logo-white.svg"
         width={width}
       />

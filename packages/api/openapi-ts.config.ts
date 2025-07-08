@@ -7,6 +7,7 @@ export default defineConfig({
     format: 'biome',
     lint: 'biome',
     path: 'src/client',
+    tsConfigPath: 'off',
   },
 
   // Plugins configuration
