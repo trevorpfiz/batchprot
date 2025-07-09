@@ -1,4 +1,5 @@
 import logging
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import jwt  # PyJWT
@@ -9,25 +10,50 @@ from functions.core.config import settings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# --- Caching Globals ---
+_jwks_cache: list[dict[str, Any]] | None = None
+_jwks_cache_expiry: datetime | None = None
+CACHE_LIFETIME_MINUTES = 60  # Cache JWKS for 1 hour
+
 
 class TokenData(BaseModel):
     sub: str | None = None
 
 
-async def get_jwks() -> list[dict[str, Any]]:
+async def get_jwks(force_refresh: bool = False) -> list[dict[str, Any]]:
     """
-    Retrieve the JSON Web Key Set (JWKS) from the authentication server.
+    Retrieve the JSON Web Key Set (JWKS) from the authentication server,
+    with in-memory caching.
     """
+    global _jwks_cache, _jwks_cache_expiry
+
+    # Check if cache is valid and refresh is not forced
+    if (
+        not force_refresh
+        and _jwks_cache
+        and _jwks_cache_expiry
+        and _jwks_cache_expiry > datetime.now(timezone.utc)
+    ):
+        logger.debug("Returning JWKS from cache.")
+        return _jwks_cache
+
+    # Fetch new JWKS if cache is invalid, expired, or refresh is forced
     import httpx
 
-    logger.info("Fetching JWKS from %s", settings.JWKS_URL)
+    logger.info("Fetching new JWKS from auth provider.")
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(settings.JWKS_URL)
             response.raise_for_status()
             jwks_data = response.json()
-            logger.info("JWKS data received: %s", jwks_data)
-            return jwks_data.get("keys", [])
+            logger.debug("JWKS data received: %s", jwks_data)
+
+            _jwks_cache = jwks_data.get("keys", [])
+            _jwks_cache_expiry = datetime.now(timezone.utc) + timedelta(
+                minutes=CACHE_LIFETIME_MINUTES
+            )
+            logger.info(f"JWKS cache updated. New expiry: {_jwks_cache_expiry}")
+            return _jwks_cache
         except httpx.HTTPStatusError as e:
             logger.error("HTTP error fetching JWKS: %s", e)
             raise
@@ -45,10 +71,21 @@ async def get_public_key(token: str) -> dict[str, Any] | None:
             logger.warning("No 'kid' found in token header.")
             return None
 
+        # Try to find key in (potentially cached) JWKS
         jwks = await get_jwks()
         for key_dict in jwks:
             if key_dict.get("kid") == kid:
                 return key_dict
+
+        # If key not found, force a refresh to handle key rotation
+        logger.warning(
+            "Key with kid '%s' not found in current JWKS. Forcing refresh.", kid
+        )
+        jwks = await get_jwks(force_refresh=True)
+        for key_dict in jwks:
+            if key_dict.get("kid") == kid:
+                return key_dict
+
         logger.warning("No matching public key found in JWKS for kid: %s", kid)
         return None
     except jwt.PyJWTError as e:

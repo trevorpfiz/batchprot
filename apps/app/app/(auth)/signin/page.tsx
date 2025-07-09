@@ -17,7 +17,7 @@ export default function SignInPage() {
       backButtonLinkLabel="Sign up"
       headerSubtitle="Welcome back! Please sign in to continue."
       headerTitle={`Sign in to ${BRAND_NAME}`}
-      showCredentials
+      // showCredentials
       showSocial
     >
       <SignInForm />

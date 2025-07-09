@@ -17,7 +17,7 @@ export default function SignUpPage() {
       backButtonLinkLabel="Sign in"
       headerSubtitle="Welcome! Please fill in the details to get started."
       headerTitle="Create your account"
-      showCredentials
+      // showCredentials
       showSocial
     >
       <SignUpForm />
