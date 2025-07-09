@@ -5,7 +5,7 @@ import type { BetterAuthOptions } from 'better-auth';
 import { betterAuth } from 'better-auth';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
 import { nextCookies } from 'better-auth/next-js';
-import { jwt } from 'better-auth/plugins';
+import { bearer, jwt } from 'better-auth/plugins';
 
 export interface AuthConfig {
   baseUrl: string;
@@ -25,6 +25,7 @@ export function initAuth(options: AuthConfig) {
     }),
     baseURL: options.baseUrl,
     plugins: [
+      bearer(),
       jwt(),
       nextCookies(), // Must be last plugin for Next.js cookie handling
     ],

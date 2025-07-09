@@ -7,7 +7,7 @@
     "pnpm": ">=10.11.0"
   },
   "type": "module",
-  "packageManager": "pnpm@10.12.4+sha512.5ea8b0deed94ed68691c9bad4c955492705c5eeb8a87ef86bc62c74a26b037b08ff9570f108b2e4dbd1dd1a9186fea925e527f141c648e85af45631074680184",
+  "packageManager": "pnpm@10.13.1",
   "scripts": {
     "analyze": "turbo analyze",
     "boundaries": "turbo boundaries",
@@ -28,7 +28,8 @@
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
     "start:db": "./start-database.sh",
-    "test": "turbo test"
+    "test": "turbo test",
+    "mfa:update": "./update-mfa-credentials.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
@@ -36,7 +37,7 @@
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.4",
     "@types/aws-lambda": "8.10.150",
-    "@types/node": "^24.0.10",
+    "@types/node": "^24.0.12",
     "commander": "^14.0.0",
     "husky": "^9.1.7",
     "sst": "3.17.10",

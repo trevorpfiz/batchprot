@@ -10,8 +10,10 @@
 import type { Auth } from '@repo/auth';
 import { db } from '@repo/database/client';
 import { initTRPC, TRPCError } from '@trpc/server';
+import { Resource } from 'sst';
 import superjson from 'superjson';
 import { ZodError, z } from 'zod/v4';
+import { client } from './client/client.gen';
 
 /**
  * 1. CONTEXT
@@ -34,10 +36,16 @@ export const createTRPCContext = async (opts: {
   const session = await authApi.getSession({
     headers: opts.headers,
   });
+
+  client.setConfig({
+    baseUrl: Resource.BatchProtAPI.url,
+  });
+
   return {
     authApi,
     session,
     db,
+    heyClient: client,
   };
 };
 /**

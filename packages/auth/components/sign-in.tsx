@@ -15,10 +15,20 @@ export const SignIn = () => {
     setError(null);
 
     try {
-      await signIn.email({
-        email,
-        password,
-      });
+      await signIn.email(
+        {
+          email,
+          password,
+        },
+        {
+          onSuccess: (ctx) => {
+            const authToken = ctx.response.headers.get('set-auth-token');
+            if (authToken) {
+              localStorage.setItem('bearer_token', authToken);
+            }
+          },
+        }
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -28,9 +38,19 @@ export const SignIn = () => {
 
   const handleGitHubSignIn = async () => {
     try {
-      await signIn.social({
-        provider: 'github',
-      });
+      await signIn.social(
+        {
+          provider: 'github',
+        },
+        {
+          onSuccess: (ctx) => {
+            const authToken = ctx.response.headers.get('set-auth-token');
+            if (authToken) {
+              localStorage.setItem('bearer_token', authToken);
+            }
+          },
+        }
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
