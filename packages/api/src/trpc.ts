@@ -12,7 +12,7 @@ import { db } from '@repo/database/client';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { Resource } from 'sst';
 import superjson from 'superjson';
-import { ZodError, z } from 'zod/v4';
+import { ZodError, z } from 'zod';
 import { client } from './client/client.gen';
 
 /**

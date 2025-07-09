@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { index } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
 import { createTable } from './_table';
 import { user } from './auth-schema';
