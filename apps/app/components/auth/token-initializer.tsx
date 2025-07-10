@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import { useBearerTokenStore } from '~/providers/bearer-token-store-provider';
 
 interface TokenInitializerProps {
@@ -8,15 +9,19 @@ interface TokenInitializerProps {
 }
 
 export function TokenInitializer({ sessionToken }: TokenInitializerProps) {
-  const fetchAndSetBearerToken = useBearerTokenStore(
-    (state) => state.fetchAndSetBearerToken
+  const { fetchAndSetBearerToken, setSessionToken } = useBearerTokenStore(
+    useShallow((state) => ({
+      fetchAndSetBearerToken: state.fetchAndSetBearerToken,
+      setSessionToken: state.setSessionToken,
+    }))
   );
 
   useEffect(() => {
     if (sessionToken) {
+      setSessionToken(sessionToken);
       fetchAndSetBearerToken(sessionToken);
     }
-  }, [sessionToken, fetchAndSetBearerToken]);
+  }, [sessionToken, fetchAndSetBearerToken, setSessionToken]);
 
   return null;
 }

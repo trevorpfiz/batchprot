@@ -1,11 +1,15 @@
+import { toast } from '@repo/design-system/components/ui/sonner';
 import {
   defaultShouldDehydrateQuery,
+  MutationCache,
+  QueryCache,
   QueryClient,
 } from '@tanstack/react-query';
 import SuperJSON from 'superjson';
+import { bearerTokenStore } from '~/stores/bearer-token-store';
 
-export const createQueryClient = () =>
-  new QueryClient({
+export const createQueryClient = () => {
+  const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         // With SSR, we usually want to set some default staleTime
@@ -30,4 +34,31 @@ export const createQueryClient = () =>
         deserializeData: SuperJSON.deserialize,
       },
     },
+    queryCache: new QueryCache({
+      onError: async (error, query) => {
+        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        const errorResponse = (error as any)?.meta?.response as Response;
+        if (errorResponse?.status === 401) {
+          try {
+            await bearerTokenStore.getState().refreshBearerToken();
+            // Invalidate and refetch the failed query
+            await queryClient.invalidateQueries({ queryKey: query.queryKey });
+          } catch (_refreshError) {
+            toast.error('Session expired. Please log in again.');
+            bearerTokenStore.getState().clearBearerToken();
+          }
+        } else {
+          toast.error(`API Error: ${error.message}`);
+        }
+      },
+    }),
+    mutationCache: new MutationCache({
+      onError: (_error, _, __, mutation) => {
+        // cache-level mutations error handler
+        const { mutationKey } = mutation.options;
+        toast.error(`API Mutation Error ${mutationKey ? `: ${mutation}` : ''}`);
+      },
+    }),
   });
+  return queryClient;
+};

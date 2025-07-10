@@ -1,16 +1,13 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext } from 'react';
 import { useStore } from 'zustand';
 
-import type {
-  BearerTokenState,
-  BearerTokenStore,
-} from '~/stores/bearer-token-store';
-import { createBearerTokenStore } from '~/stores/bearer-token-store';
+import type { BearerTokenStore } from '~/stores/bearer-token-store';
+import { bearerTokenStore } from '~/stores/bearer-token-store';
 
-export type BearerTokenStoreApi = ReturnType<typeof createBearerTokenStore>;
+export type BearerTokenStoreApi = typeof bearerTokenStore;
 
 export const BearerTokenStoreContext = createContext<
   BearerTokenStoreApi | undefined
@@ -18,21 +15,13 @@ export const BearerTokenStoreContext = createContext<
 
 export interface BearerTokenStoreProviderProps {
   children: ReactNode;
-  initialState?: BearerTokenState;
 }
 
 export function BearerTokenStoreProvider({
   children,
-  initialState,
 }: BearerTokenStoreProviderProps) {
-  const storeRef = useRef<BearerTokenStoreApi>(null);
-
-  if (!storeRef.current) {
-    storeRef.current = createBearerTokenStore(initialState);
-  }
-
   return (
-    <BearerTokenStoreContext.Provider value={storeRef.current}>
+    <BearerTokenStoreContext.Provider value={bearerTokenStore}>
       {children}
     </BearerTokenStoreContext.Provider>
   );
