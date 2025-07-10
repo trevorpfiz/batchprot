@@ -26,7 +26,11 @@ export function initAuth(options: AuthConfig) {
     baseURL: options.baseUrl,
     plugins: [
       bearer(),
-      jwt(),
+      jwt({
+        jwt: {
+          expirationTime: '1y',
+        },
+      }),
       nextCookies(), // Must be last plugin for Next.js cookie handling
     ],
     secret: options.secret,

@@ -16,6 +16,14 @@ export const createQueryClient = () => {
         // above 0 to avoid refetching immediately on the client
         staleTime: 30 * 1000,
         refetchOnWindowFocus: false,
+        retry: (failureCount, error) => {
+          // biome-ignore lint/suspicious/noExplicitAny: This is a generic error handler
+          const errorResponse = (error as any)?.meta?.response as Response;
+          if (errorResponse?.status === 401) {
+            return false;
+          }
+          return failureCount < 3;
+        },
       },
       dehydrate: {
         serializeData: SuperJSON.serialize,
@@ -35,9 +43,10 @@ export const createQueryClient = () => {
         deserializeData: SuperJSON.deserialize,
       },
     },
+    // FIXME: not refreshing token on 401
     queryCache: new QueryCache({
       onError: async (error, query) => {
-        // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+        // biome-ignore lint/suspicious/noExplicitAny: This is a generic error handler
         const errorResponse = (error as any)?.meta?.response as Response;
         if (errorResponse?.status === 401) {
           try {

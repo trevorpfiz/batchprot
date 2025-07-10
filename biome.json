@@ -1,13 +1,26 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.0.6/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
   "extends": ["ultracite"],
   "files": {
     "includes": [
       "**",
-      "!packages/design-system/components/ui/**",
-      "!packages/design-system/lib/**",
-      "!packages/design-system/hooks/**",
-      "!apps/email/.react-email/**"
+      "!**/node_modules/**",
+      "!**/dist/**",
+      "!**/.sst/**",
+      "!**/.turbo/**",
+      "!**/.venv/**",
+      "!**/packages/design-system/components/ui/**",
+      "!**/packages/design-system/lib/**",
+      "!**/packages/design-system/hooks/**",
+      "!**/apps/email/.react-email/**"
+    ],
+    "experimentalScannerIgnores": [
+      "node_modules",
+      "dist",
+      ".sst",
+      ".next",
+      ".turbo",
+      ".venv"
     ]
   }
 }
