@@ -34,6 +34,7 @@ import { useId } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { formatBytes, useFileUpload } from '~/hooks/use-file-upload';
+import { useProteinAnalysisStore } from '~/providers/protein-analysis-store-provider';
 import { useTRPC } from '~/trpc/react';
 
 // Local validation schema
@@ -61,6 +62,30 @@ const validateProteinJobSubmission = (
   return { isValid: true };
 };
 
+// Helper function to parse FASTA sequences
+const parseFastaSequences = (text: string): string[] => {
+  const lines = text.trim().split('\n');
+  const sequences: string[] = [];
+  let currentSequence = '';
+
+  for (const line of lines) {
+    if (line.startsWith('>')) {
+      if (currentSequence) {
+        sequences.push(currentSequence.replace(/\s/g, ''));
+        currentSequence = '';
+      }
+    } else {
+      currentSequence += line.trim();
+    }
+  }
+
+  if (currentSequence) {
+    sequences.push(currentSequence.replace(/\s/g, ''));
+  }
+
+  return sequences.filter((seq) => seq.length > 0);
+};
+
 // Example protein sequences
 const EXAMPLE_SEQUENCES = `>sp|P04637|P53_HUMAN Cellular tumor antigen p53 OS=Homo sapiens OX=9606 GN=TP53 PE=1 SV=4
 MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELPPGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPGGSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD
@@ -76,6 +101,9 @@ export function ProteinForm() {
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const textareaId = useId();
+
+  // Use protein analysis store
+  const setSequences = useProteinAnalysisStore((state) => state.setSequences);
 
   const maxSize = 10 * 1024 * 1024; // 10MB default
 
@@ -117,10 +145,12 @@ export function ProteinForm() {
   const isFormValid = hasValidTitle && (hasSequences || hasFile);
 
   const createMutation = useMutation(
-    trpc.job.create.mutationOptions({
+    trpc.job.createWithSequences.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.job.byUser.queryKey() });
         if (data.job) {
+          // Store sequences in zustand store instead of sessionStorage
+          setSequences(data.job.id, data.sequences);
           router.push(`/job/${data.job.id}`);
         }
       },
@@ -154,19 +184,31 @@ export function ProteinForm() {
         return;
       }
 
-      let _sequencesText = '';
+      let sequencesText = '';
 
       // If a file is provided, use it instead of textarea content
       if (file && file.file instanceof File) {
-        _sequencesText = await handleFileRead(file.file);
+        sequencesText = await handleFileRead(file.file);
       } else if (data.sequences) {
-        _sequencesText = data.sequences;
+        sequencesText = data.sequences;
       }
 
+      // Parse sequences for validation
+      const parsedSequences = parseFastaSequences(sequencesText);
+
+      if (parsedSequences.length === 0) {
+        form.setError('sequences', {
+          type: 'manual',
+          message: 'No valid protein sequences found. Please check your input.',
+        });
+        return;
+      }
+
+      // Create job with sequences
       createMutation.mutate({
         title: data.title,
-        // For now, we'll just create the job with the title
-        // Later we can add the sequences to the job creation
+        algorithm: 'biopython-1.85',
+        sequences: parsedSequences,
       });
     } catch (error) {
       handleError(error);
@@ -183,7 +225,8 @@ export function ProteinForm() {
         <CardTitle>Protein Analysis Job</CardTitle>
         <CardDescription>
           Enter protein sequences directly or upload a FASTA file to start your
-          analysis
+          analysis. The job will be created immediately and analysis will begin
+          in the background.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -343,7 +386,9 @@ export function ProteinForm() {
                 disabled={!isFormValid || createMutation.isPending}
                 type="submit"
               >
-                {createMutation.isPending ? 'Creating Job...' : 'Create Job'}
+                {createMutation.isPending
+                  ? 'Creating Job...'
+                  : 'Create Job & Start Analysis'}
               </Button>
             </div>
           </form>

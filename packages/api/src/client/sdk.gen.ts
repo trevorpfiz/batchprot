@@ -41,7 +41,7 @@ export const healthReadRoot = <ThrowOnError extends boolean = false>(
     unknown,
     ThrowOnError
   >({
-    url: '/api/v1/health/',
+    url: '/api/v1/health',
     ...options,
   });
 };
@@ -64,7 +64,7 @@ export const analysisRunAnalysis = <ThrowOnError extends boolean = false>(
         type: 'http',
       },
     ],
-    url: '/api/v1/analyze/',
+    url: '/api/v1/analyze',
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -91,7 +91,7 @@ export const authCheckAuth = <ThrowOnError extends boolean = false>(
         type: 'http',
       },
     ],
-    url: '/api/v1/auth-check/',
+    url: '/api/v1/auth-check',
     ...options,
   });
 };

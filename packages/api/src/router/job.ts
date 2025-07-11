@@ -6,8 +6,16 @@ import {
   updateJobSchema,
 } from '@repo/database/schema';
 import type { TRPCRouterRecord } from '@trpc/server';
+import { z } from 'zod';
 
 import { protectedProcedure } from '../trpc';
+
+// Schema for creating job with sequences
+const createJobWithSequencesSchema = z.object({
+  title: z.string().min(1).max(256),
+  algorithm: z.string().optional(),
+  sequences: z.array(z.string()).min(1),
+});
 
 export const jobRouter = {
   byUser: protectedProcedure.query(async ({ ctx }) => {
@@ -59,6 +67,28 @@ export const jobRouter = {
         .returning();
 
       return { job };
+    }),
+
+  createWithSequences: protectedProcedure
+    .input(createJobWithSequencesSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { db, session } = ctx;
+      const user = session.user;
+      const { title, algorithm, sequences } = input;
+
+      const [job] = await db
+        .insert(Job)
+        .values({
+          title,
+          algorithm,
+          userId: user.id,
+          status: 'queued',
+        })
+        .returning();
+
+      // Store sequences in job metadata for later processing
+      // We'll use this when triggering the analysis
+      return { job, sequences };
     }),
 
   rename: protectedProcedure

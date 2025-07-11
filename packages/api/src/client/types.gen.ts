@@ -109,6 +109,18 @@ export type ProteinAnalysisResult = {
    */
   sheet_fraction: number;
   /**
+   * Extinction Coeff Reduced
+   */
+  extinction_coeff_reduced: number;
+  /**
+   * Extinction Coeff Oxidized
+   */
+  extinction_coeff_oxidized: number;
+  /**
+   * Charge At Ph7
+   */
+  charge_at_ph7: number;
+  /**
    * Amino Acid Counts
    */
   amino_acid_counts: {
@@ -144,7 +156,7 @@ export type HealthReadRootData = {
   body?: never;
   path?: never;
   query?: never;
-  url: '/api/v1/health/';
+  url: '/api/v1/health';
 };
 
 export type HealthReadRootResponses = {
@@ -161,7 +173,7 @@ export type AnalysisRunAnalysisData = {
   body: ProteinAnalysisRequest;
   path?: never;
   query?: never;
-  url: '/api/v1/analyze/';
+  url: '/api/v1/analyze';
 };
 
 export type AnalysisRunAnalysisErrors = {
@@ -196,7 +208,7 @@ export type AuthCheckAuthData = {
   body?: never;
   path?: never;
   query?: never;
-  url: '/api/v1/auth-check/';
+  url: '/api/v1/auth-check';
 };
 
 export type AuthCheckAuthErrors = {

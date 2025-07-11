@@ -61,6 +61,9 @@ export const zProteinAnalysisResult = z.object({
   helix_fraction: z.number(),
   turn_fraction: z.number(),
   sheet_fraction: z.number(),
+  extinction_coeff_reduced: z.number().int(),
+  extinction_coeff_oxidized: z.number().int(),
+  charge_at_ph7: z.number(),
   amino_acid_counts: z.object({}),
   amino_acid_percentages: z.object({}),
 });

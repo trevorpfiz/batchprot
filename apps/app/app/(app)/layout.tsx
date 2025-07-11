@@ -10,6 +10,7 @@ import { TokenInitializer } from '~/components/auth/token-initializer';
 import { SettingsDialog } from '~/components/settings/settings-dialog';
 import { AppSidebar } from '~/components/sidebar/app-sidebar';
 import { BearerTokenStoreProvider } from '~/providers/bearer-token-store-provider';
+import { ProteinAnalysisStoreProvider } from '~/providers/protein-analysis-store-provider';
 import { SettingsDialogStoreProvider } from '~/providers/settings-dialog-store-provider';
 import { HydrateClient, prefetch, trpc } from '~/trpc/server';
 
@@ -31,11 +32,13 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
         <TokenInitializer sessionToken={sessionToken} />
         <SidebarProvider>
           <SettingsDialogStoreProvider>
-            <AppSidebar />
-            <SidebarInset className="h-dvh">
-              {children}
-              <SettingsDialog />
-            </SidebarInset>
+            <ProteinAnalysisStoreProvider>
+              <AppSidebar />
+              <SidebarInset className="h-dvh">
+                {children}
+                <SettingsDialog />
+              </SidebarInset>
+            </ProteinAnalysisStoreProvider>
           </SettingsDialogStoreProvider>
         </SidebarProvider>
       </BearerTokenStoreProvider>
