@@ -29,7 +29,7 @@
     "postinstall": "pnpm lint:ws",
     "start:db": "./start-database.sh",
     "test": "turbo test",
-    "mfa:update": "./update-mfa-credentials.sh"
+    "mfa:update": "./mfa.sh"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",

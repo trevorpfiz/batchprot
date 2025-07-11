@@ -1,6 +1,5 @@
 'use client';
 
-import { Spinner } from '@repo/design-system/components/spinner';
 import { Button } from '@repo/design-system/components/ui/button';
 import {
   Sidebar,
@@ -16,31 +15,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@repo/design-system/components/ui/tooltip';
-import { handleError } from '@repo/design-system/lib/utils';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { SquarePen } from 'lucide-react';
+import Link from 'next/link';
 import React from 'react';
 import { Logo } from '~/components/logo';
 import { NavFooter } from '~/components/sidebar/nav-footer';
 import { NavJobs, NavJobsSkeleton } from '~/components/sidebar/nav-jobs';
 import { NavMain } from '~/components/sidebar/nav-main';
-import { useTRPC } from '~/trpc/react';
 
 export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
-  const trpc = useTRPC();
-  const queryClient = useQueryClient();
-
-  const createMutation = useMutation(
-    trpc.job.create.mutationOptions({
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: trpc.job.byUser.queryKey() });
-      },
-      onError: (error) => {
-        handleError(error);
-      },
-    })
-  );
-
   return (
     <Sidebar className="border-r-0" {...props}>
       <SidebarHeader className="mb-[1px] py-3">
@@ -55,21 +38,14 @@ export function AppSidebar(props: React.ComponentProps<typeof Sidebar>) {
                 <TooltipTrigger asChild>
                   <Button
                     aria-label="Add new job"
+                    asChild
                     className="h-8 w-8"
-                    disabled={createMutation.isPending}
-                    onClick={() => {
-                      createMutation.mutate({
-                        title: 'New job',
-                      });
-                    }}
                     size="icon"
                     variant="ghost"
                   >
-                    {createMutation.isPending ? (
-                      <Spinner />
-                    ) : (
+                    <Link href="/">
                       <SquarePen aria-hidden="true" size={16} strokeWidth={2} />
-                    )}
+                    </Link>
                   </Button>
                 </TooltipTrigger>
                 <TooltipContent className="px-2 py-1 text-xs">

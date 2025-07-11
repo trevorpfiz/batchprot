@@ -1,5 +1,6 @@
 import { AppHeader } from '~/components/app-header';
 import { UserButtonWrapper } from '~/components/auth/user-button-wrapper';
+import { ProteinForm } from '~/components/protein-form';
 
 export default function Page() {
   return (
@@ -7,11 +8,15 @@ export default function Page() {
       <AppHeader userButton={<UserButtonWrapper />} />
       <div className="flex-1 overflow-auto">
         <main className="h-full">
-          <div className="flex h-full flex-col items-center justify-center">
-            <h1 className="font-semibold text-4xl">Welcome!</h1>
-            <h2 className="text-lg text-muted-foreground">
-              Create a new job to get started.
-            </h2>
+          <div className="container mx-auto max-w-2xl p-6">
+            <div className="mb-8 text-center">
+              <h1 className="font-semibold text-4xl">Create New Job</h1>
+              <p className="mt-2 text-lg text-muted-foreground">
+                Analyze protein sequences using computational tools
+              </p>
+            </div>
+
+            <ProteinForm />
           </div>
         </main>
       </div>
