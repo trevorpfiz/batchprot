@@ -1,7 +1,12 @@
+import type { ProteinAnalysis } from '@repo/database/src/protein-schema';
 import { createStore } from 'zustand/vanilla';
 
 export interface ProteinAnalysisState {
   sequences: Record<string, string[]>; // jobId -> sequences mapping
+  detailsDialog: {
+    isOpen: boolean;
+    selectedProtein: ProteinAnalysis | null;
+  };
 }
 
 export interface ProteinAnalysisActions {
@@ -9,6 +14,8 @@ export interface ProteinAnalysisActions {
   getSequences: (jobId: string) => string[];
   clearSequences: (jobId: string) => void;
   clearAllSequences: () => void;
+  openProteinDetails: (protein: ProteinAnalysis) => void;
+  closeProteinDetails: () => void;
 }
 
 export type ProteinAnalysisStore = ProteinAnalysisState &
@@ -16,6 +23,10 @@ export type ProteinAnalysisStore = ProteinAnalysisState &
 
 export const defaultProteinAnalysisState: ProteinAnalysisState = {
   sequences: {},
+  detailsDialog: {
+    isOpen: false,
+    selectedProtein: null,
+  },
 };
 
 export const createProteinAnalysisStore = (
@@ -41,5 +52,19 @@ export const createProteinAnalysisStore = (
         return { sequences: newSequences };
       }),
     clearAllSequences: () => set(() => ({ sequences: {} })),
+    openProteinDetails: (protein: ProteinAnalysis) =>
+      set(() => ({
+        detailsDialog: {
+          isOpen: true,
+          selectedProtein: protein,
+        },
+      })),
+    closeProteinDetails: () =>
+      set(() => ({
+        detailsDialog: {
+          isOpen: false,
+          selectedProtein: null,
+        },
+      })),
   }));
 };

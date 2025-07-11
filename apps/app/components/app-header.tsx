@@ -41,12 +41,6 @@ export function AppHeader(props: AppHeaderProps) {
         )}
       </div>
 
-      {isJobRoute && (
-        <div className="flex items-center">
-          <p>Actions</p>
-        </div>
-      )}
-
       <div className="flex items-center">{userButton}</div>
     </header>
   );

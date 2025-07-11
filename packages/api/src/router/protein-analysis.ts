@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { and, eq } from '@repo/database';
+import { and, eq, inArray } from '@repo/database';
 import { Job, ProteinAnalysis } from '@repo/database/schema';
 import type { TRPCRouterRecord } from '@trpc/server';
 import { z } from 'zod';
@@ -234,5 +234,69 @@ export const proteinAnalysisRouter = {
       });
 
       return { analyses };
+    }),
+
+  delete: protectedProcedure
+    .input(z.object({ id: z.uuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const { db, session } = ctx;
+      const user = session.user;
+      const { id } = input;
+
+      // First, verify the protein analysis belongs to the user through the job relationship
+      const proteinAnalysis = await db.query.ProteinAnalysis.findFirst({
+        where: eq(ProteinAnalysis.id, id),
+        with: {
+          job: true,
+        },
+      });
+
+      if (!proteinAnalysis || proteinAnalysis.job.userId !== user.id) {
+        throw new Error('Protein analysis not found or access denied');
+      }
+
+      // Delete the protein analysis
+      const [deletedAnalysis] = await db
+        .delete(ProteinAnalysis)
+        .where(eq(ProteinAnalysis.id, id))
+        .returning();
+
+      return { proteinAnalysis: deletedAnalysis };
+    }),
+
+  deleteMany: protectedProcedure
+    .input(z.object({ ids: z.array(z.uuid()).min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      const { db, session } = ctx;
+      const user = session.user;
+      const { ids } = input;
+
+      // First, verify all protein analyses belong to the user through job relationships
+      const proteinAnalyses = await db.query.ProteinAnalysis.findMany({
+        where: inArray(ProteinAnalysis.id, ids),
+        with: {
+          job: true,
+        },
+      });
+
+      // Verify all analyses belong to the user
+      const userAnalyses = proteinAnalyses.filter(
+        (analysis) => analysis.job.userId === user.id
+      );
+
+      if (userAnalyses.length !== ids.length) {
+        throw new Error('Some protein analyses not found or access denied');
+      }
+
+      // Delete all protein analyses
+      const deletedAnalyses = await db
+        .delete(ProteinAnalysis)
+        .where(inArray(ProteinAnalysis.id, ids))
+        .returning();
+
+      return {
+        proteinAnalyses: deletedAnalyses,
+        count: deletedAnalyses.length,
+      };
     }),
 } satisfies TRPCRouterRecord;

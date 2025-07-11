@@ -7,6 +7,7 @@ import type { ReactNode } from 'react';
 
 import { getSession } from '~/auth/server';
 import { TokenInitializer } from '~/components/auth/token-initializer';
+import { ProteinDetailsDialog } from '~/components/protein-details-dialog';
 import { SettingsDialog } from '~/components/settings/settings-dialog';
 import { AppSidebar } from '~/components/sidebar/app-sidebar';
 import { BearerTokenStoreProvider } from '~/providers/bearer-token-store-provider';
@@ -37,6 +38,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
               <SidebarInset className="h-dvh">
                 {children}
                 <SettingsDialog />
+                <ProteinDetailsDialog />
               </SidebarInset>
             </ProteinAnalysisStoreProvider>
           </SettingsDialogStoreProvider>

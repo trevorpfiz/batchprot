@@ -1,5 +1,6 @@
 'use client';
 
+import type { ProteinAnalysis } from '@repo/database/src/protein-schema';
 import { Badge } from '@repo/design-system/components/ui/badge';
 import {
   Card,
@@ -7,13 +8,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@repo/design-system/components/ui/card';
-import { Separator } from '@repo/design-system/components/ui/separator';
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { ProteinTable } from '~/components/protein-table';
 import { useBearerTokenStore } from '~/providers/bearer-token-store-provider';
 import { useProteinAnalysisStore } from '~/providers/protein-analysis-store-provider';
-
 import { useTRPC } from '~/trpc/react';
 
 interface JobContentProps {
@@ -27,7 +27,37 @@ function ProteinAnalysisResults({ jobId }: { jobId: string }) {
     data: analysisData,
     isLoading,
     error,
+    refetch,
   } = useQuery(trpc.proteinAnalysis.byJobId.queryOptions({ jobId }));
+
+  // Define mutations at the top level
+  const deleteMutation = useMutation(
+    trpc.proteinAnalysis.delete.mutationOptions({
+      onSuccess: () => {
+        refetch();
+      },
+    })
+  );
+
+  const deleteManyMutation = useMutation(
+    trpc.proteinAnalysis.deleteMany.mutationOptions({
+      onSuccess: () => {
+        refetch();
+      },
+    })
+  );
+
+  const handleDeleteProteins = (proteins: ProteinAnalysis[]) => {
+    // Extract IDs from the proteins to delete
+    const proteinIds = proteins.map((p) => p.id);
+
+    // Use deleteMany if multiple proteins, delete if single protein
+    if (proteinIds.length > 1) {
+      deleteManyMutation.mutate({ ids: proteinIds });
+    } else {
+      deleteMutation.mutate({ id: proteinIds[0] });
+    }
+  };
 
   if (isLoading) {
     return <p>Loading protein analysis results...</p>;
@@ -65,141 +95,10 @@ function ProteinAnalysisResults({ jobId }: { jobId: string }) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-6">
-            {analysisData.analyses.map((analysis, index) => (
-              <div className="space-y-4" key={analysis.id}>
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-lg">
-                    Protein #{index + 1}
-                  </h3>
-                  <Badge variant="secondary">
-                    Length: {analysis.length} AA
-                  </Badge>
-                </div>
-
-                {/* Sequence Display */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Sequence:</h4>
-                  <div className="rounded bg-muted p-3">
-                    <code className="break-all font-mono text-sm">
-                      {analysis.sequence.length > 200
-                        ? `${analysis.sequence.substring(0, 200)}...`
-                        : analysis.sequence}
-                    </code>
-                  </div>
-                </div>
-
-                {/* Analysis Results Grid */}
-                <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm">Molecular Weight</p>
-                    <p className="font-bold text-2xl">
-                      {Number(analysis.molecularWeight).toFixed(2)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">Da</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm">Isoelectric Point</p>
-                    <p className="font-bold text-2xl">
-                      {Number(analysis.isoelectricPoint).toFixed(2)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">pI</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm">Instability Index</p>
-                    <p className="font-bold text-2xl">
-                      {Number(analysis.instabilityIndex).toFixed(2)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {Number(analysis.instabilityIndex) > 40
-                        ? 'Unstable'
-                        : 'Stable'}
-                    </p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm">Aromaticity</p>
-                    <p className="font-bold text-2xl">
-                      {Number(analysis.aromaticity).toFixed(3)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">Fraction</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm">GRAVY</p>
-                    <p className="font-bold text-2xl">
-                      {Number(analysis.gravy).toFixed(2)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">Hydropathy</p>
-                  </div>
-
-                  <div className="space-y-1">
-                    <p className="font-medium text-sm">Charge at pH 7</p>
-                    <p className="font-bold text-2xl">
-                      {Number(analysis.chargeAtPh7).toFixed(2)}
-                    </p>
-                    <p className="text-muted-foreground text-xs">Net charge</p>
-                  </div>
-                </div>
-
-                {/* Secondary Structure */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">
-                    Secondary Structure Fractions
-                  </h4>
-                  <div className="grid grid-cols-3 gap-4">
-                    <div className="rounded bg-blue-50 p-3">
-                      <p className="font-medium text-blue-800">Helix</p>
-                      <p className="font-bold text-blue-900 text-xl">
-                        {(Number(analysis.helixFraction) * 100).toFixed(1)}%
-                      </p>
-                    </div>
-                    <div className="rounded bg-green-50 p-3">
-                      <p className="font-medium text-green-800">Turn</p>
-                      <p className="font-bold text-green-900 text-xl">
-                        {(Number(analysis.turnFraction) * 100).toFixed(1)}%
-                      </p>
-                    </div>
-                    <div className="rounded bg-purple-50 p-3">
-                      <p className="font-medium text-purple-800">Sheet</p>
-                      <p className="font-bold text-purple-900 text-xl">
-                        {(Number(analysis.sheetFraction) * 100).toFixed(1)}%
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Extinction Coefficients */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">
-                    Extinction Coefficients
-                  </h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="rounded bg-gray-50 p-3">
-                      <p className="font-medium text-gray-800">Reduced</p>
-                      <p className="font-bold text-gray-900 text-xl">
-                        {analysis.extinctionCoeffReduced.toLocaleString()}
-                      </p>
-                      <p className="text-gray-600 text-xs">M⁻¹cm⁻¹</p>
-                    </div>
-                    <div className="rounded bg-gray-50 p-3">
-                      <p className="font-medium text-gray-800">Oxidized</p>
-                      <p className="font-bold text-gray-900 text-xl">
-                        {analysis.extinctionCoeffOxidized.toLocaleString()}
-                      </p>
-                      <p className="text-gray-600 text-xs">M⁻¹cm⁻¹</p>
-                    </div>
-                  </div>
-                </div>
-
-                {index < analysisData.analyses.length - 1 && (
-                  <Separator className="my-6" />
-                )}
-              </div>
-            ))}
-          </div>
+          <ProteinTable
+            data={analysisData.analyses}
+            onDeleteProteins={handleDeleteProteins}
+          />
         </CardContent>
       </Card>
     </div>
