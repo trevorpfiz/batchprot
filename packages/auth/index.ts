@@ -24,6 +24,9 @@ export function initAuth(options: AuthConfig) {
       provider: 'pg',
     }),
     baseURL: options.baseUrl,
+    emailAndPassword: {
+      enabled: true,
+    },
     plugins: [
       bearer(),
       jwt({

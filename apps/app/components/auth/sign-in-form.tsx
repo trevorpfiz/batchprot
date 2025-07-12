@@ -15,7 +15,6 @@ import { Input } from '@repo/design-system/components/ui/input';
 import type { SignIn } from '@repo/validators/auth';
 import { SignInSchema } from '@repo/validators/auth';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
 import { useForm } from 'react-hook-form';
@@ -83,14 +82,14 @@ export const SignInForm = () => {
                     type="password"
                   />
                 </FormControl>
-                <Button
+                {/* <Button
                   asChild
                   className="px-0 font-normal"
                   size="sm"
                   variant="link"
                 >
                   <Link href="/forgot-password">Forgot password?</Link>
-                </Button>
+                </Button> */}
                 <FormMessage />
               </FormItem>
             )}

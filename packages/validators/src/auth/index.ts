@@ -23,7 +23,6 @@ export const SignUpSchema = z.object({
   }),
 });
 export type SignUp = z.infer<typeof SignUpSchema>;
-
 export const OTPSchema = z.object({
   otp: z.string().min(6, {
     message: 'OTP must be at least 6 characters',
