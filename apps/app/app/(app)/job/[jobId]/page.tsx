@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { Resource } from 'sst';
 
 import { JobContent } from '~/app/(app)/job/[jobId]/job-content';
 import { JobSkeleton } from '~/app/(app)/job/[jobId]/job-skeleton';
@@ -18,12 +17,10 @@ export default async function JobPage({ params }: JobPageProps) {
     notFound();
   }
 
-  const apiUrl = Resource.BatchProtAPI.url;
-
   return (
     <main className="h-full">
       <Suspense fallback={<JobSkeleton />}>
-        <JobContent apiUrl={apiUrl} jobId={jobId} />
+        <JobContent jobId={jobId} />
       </Suspense>
     </main>
   );

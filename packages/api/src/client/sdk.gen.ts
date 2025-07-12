@@ -49,6 +49,7 @@ export const healthReadRoot = <ThrowOnError extends boolean = false>(
 /**
  * Run Analysis
  * Run protein analysis on a list of sequences.
+ * Supports both basic and advanced analysis types.
  */
 export const analysisRunAnalysis = <ThrowOnError extends boolean = false>(
   options: Options<AnalysisRunAnalysisData, ThrowOnError>

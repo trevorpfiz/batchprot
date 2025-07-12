@@ -1,7 +1,9 @@
 'use client';
 
 import type { ProteinAnalysis } from '@repo/database/src/protein-schema';
+import { Spinner } from '@repo/design-system/components/spinner';
 import { Badge } from '@repo/design-system/components/ui/badge';
+import { Button } from '@repo/design-system/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,6 +11,7 @@ import {
   CardTitle,
 } from '@repo/design-system/components/ui/card';
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { DownloadIcon } from 'lucide-react';
 import { useEffect } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ProteinTable } from '~/components/protein-table';
@@ -20,8 +23,135 @@ interface JobContentProps {
   jobId: string;
 }
 
+// CSV export function
+const exportToCSV = (analyses: ProteinAnalysis[], jobTitle: string) => {
+  // Create CSV header with comprehensive information
+  const exportDate = new Date().toISOString();
+  const header = [
+    `"Protein Analysis Results Report"`,
+    `"Job: ${jobTitle}"`,
+    `"Export Date: ${exportDate}"`,
+    `"Total Proteins: ${analyses.length}"`,
+    '', // Empty line
+  ].join('\n');
+
+  // CSV column headers
+  const csvHeaders = [
+    'Protein ID',
+    'Sequence',
+    'Length (AA)',
+    'Molecular Weight (Da)',
+    'Isoelectric Point',
+    'Aromaticity',
+    'Instability Index',
+    'Stability',
+    'GRAVY',
+    'Charge at pH 7',
+    'Helix Fraction (%)',
+    'Turn Fraction (%)',
+    'Sheet Fraction (%)',
+    'Extinction Coeff (Reduced)',
+    'Extinction Coeff (Oxidized)',
+    'Alanine (%)',
+    'Cysteine (%)',
+    'Aspartic Acid (%)',
+    'Glutamic Acid (%)',
+    'Phenylalanine (%)',
+    'Glycine (%)',
+    'Histidine (%)',
+    'Isoleucine (%)',
+    'Lysine (%)',
+    'Leucine (%)',
+    'Methionine (%)',
+    'Asparagine (%)',
+    'Proline (%)',
+    'Glutamine (%)',
+    'Arginine (%)',
+    'Serine (%)',
+    'Threonine (%)',
+    'Valine (%)',
+    'Tryptophan (%)',
+    'Tyrosine (%)',
+    'Created At',
+    'Updated At',
+  ];
+
+  // Convert data to CSV rows
+  const csvRows = analyses.map((analysis, index) => {
+    const aminoAcidPercentages = analysis.result?.aminoAcidPercentages || {};
+    const stability =
+      Number(analysis.instabilityIndex) > 40 ? 'Unstable' : 'Stable';
+
+    return [
+      `"Protein_${index + 1}"`,
+      `"${analysis.sequence.replace(/"/g, '""')}"`, // Escape quotes in sequence
+      analysis.length.toString(),
+      Number(analysis.molecularWeight).toFixed(2),
+      Number(analysis.isoelectricPoint).toFixed(2),
+      Number(analysis.aromaticity).toFixed(3),
+      Number(analysis.instabilityIndex).toFixed(2),
+      stability,
+      Number(analysis.gravy).toFixed(2),
+      Number(analysis.chargeAtPh7).toFixed(2),
+      (Number(analysis.helixFraction) * 100).toFixed(1),
+      (Number(analysis.turnFraction) * 100).toFixed(1),
+      (Number(analysis.sheetFraction) * 100).toFixed(1),
+      analysis.extinctionCoeffReduced?.toString() || '',
+      analysis.extinctionCoeffOxidized?.toString() || '',
+      (aminoAcidPercentages.A || 0).toFixed(1),
+      (aminoAcidPercentages.C || 0).toFixed(1),
+      (aminoAcidPercentages.D || 0).toFixed(1),
+      (aminoAcidPercentages.E || 0).toFixed(1),
+      (aminoAcidPercentages.F || 0).toFixed(1),
+      (aminoAcidPercentages.G || 0).toFixed(1),
+      (aminoAcidPercentages.H || 0).toFixed(1),
+      (aminoAcidPercentages.I || 0).toFixed(1),
+      (aminoAcidPercentages.K || 0).toFixed(1),
+      (aminoAcidPercentages.L || 0).toFixed(1),
+      (aminoAcidPercentages.M || 0).toFixed(1),
+      (aminoAcidPercentages.N || 0).toFixed(1),
+      (aminoAcidPercentages.P || 0).toFixed(1),
+      (aminoAcidPercentages.Q || 0).toFixed(1),
+      (aminoAcidPercentages.R || 0).toFixed(1),
+      (aminoAcidPercentages.S || 0).toFixed(1),
+      (aminoAcidPercentages.T || 0).toFixed(1),
+      (aminoAcidPercentages.V || 0).toFixed(1),
+      (aminoAcidPercentages.W || 0).toFixed(1),
+      (aminoAcidPercentages.Y || 0).toFixed(1),
+      new Date(analysis.createdAt).toISOString(),
+      analysis.updatedAt ? new Date(analysis.updatedAt).toISOString() : '',
+    ].join(',');
+  });
+
+  // Combine all parts
+  const csvContent = [header, csvHeaders.join(','), ...csvRows].join('\n');
+
+  // Create and download file
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+
+  if (link.download !== undefined) {
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute(
+      'download',
+      `protein_analysis_${jobTitle.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.csv`
+    );
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+};
+
 // Component to display protein analysis results
-function ProteinAnalysisResults({ jobId }: { jobId: string }) {
+function ProteinAnalysisResults({
+  jobId,
+  jobTitle,
+}: {
+  jobId: string;
+  jobTitle: string;
+}) {
   const trpc = useTRPC();
   const {
     data: analysisData,
@@ -59,8 +189,18 @@ function ProteinAnalysisResults({ jobId }: { jobId: string }) {
     }
   };
 
+  const handleExportCSV = () => {
+    if (analysisData?.analyses) {
+      exportToCSV(analysisData.analyses, jobTitle);
+    }
+  };
+
   if (isLoading) {
-    return <p>Loading protein analysis results...</p>;
+    return (
+      <div className="flex h-full items-center justify-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (error) {
@@ -90,9 +230,20 @@ function ProteinAnalysisResults({ jobId }: { jobId: string }) {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>
-            Protein Analysis Results ({analysisData.analyses.length})
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle>
+              Protein Analysis Results ({analysisData.analyses.length})
+            </CardTitle>
+            <Button
+              className="flex items-center gap-2"
+              onClick={handleExportCSV}
+              size="sm"
+              variant="outline"
+            >
+              <DownloadIcon size={16} />
+              Export CSV
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <ProteinTable
@@ -207,6 +358,10 @@ export function JobContent({ jobId }: JobContentProps) {
               {jobData.job.algorithm || 'Not specified'}
             </div>
             <div>
+              <span className="font-semibold">Analysis Type:</span>{' '}
+              {jobData.job.analysisType || 'Not specified'}
+            </div>
+            <div>
               <span className="font-semibold">Created:</span>{' '}
               {new Date(jobData.job.createdAt).toLocaleDateString()}
             </div>
@@ -216,7 +371,7 @@ export function JobContent({ jobId }: JobContentProps) {
 
       {/* Protein Analysis Results */}
       {jobData.job.status === 'succeeded' && (
-        <ProteinAnalysisResults jobId={jobId} />
+        <ProteinAnalysisResults jobId={jobId} jobTitle={jobData.job.title} />
       )}
 
       {jobData.job.status === 'failed' && (

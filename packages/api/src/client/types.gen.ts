@@ -52,6 +52,10 @@ export type ProteinAnalysisRequest = {
    * Sequences
    */
   sequences: Array<string>;
+  /**
+   * Analysis Type
+   */
+  analysis_type?: string;
 };
 
 /**
@@ -81,45 +85,45 @@ export type ProteinAnalysisResult = {
    */
   molecular_weight: number;
   /**
-   * Aromaticity
-   */
-  aromaticity: number;
-  /**
-   * Instability Index
-   */
-  instability_index: number;
-  /**
-   * Gravy
-   */
-  gravy: number;
-  /**
    * Isoelectric Point
    */
   isoelectric_point: number;
   /**
+   * Aromaticity
+   */
+  aromaticity?: number | null;
+  /**
+   * Instability Index
+   */
+  instability_index?: number | null;
+  /**
+   * Gravy
+   */
+  gravy?: number | null;
+  /**
    * Helix Fraction
    */
-  helix_fraction: number;
+  helix_fraction?: number | null;
   /**
    * Turn Fraction
    */
-  turn_fraction: number;
+  turn_fraction?: number | null;
   /**
    * Sheet Fraction
    */
-  sheet_fraction: number;
+  sheet_fraction?: number | null;
   /**
    * Extinction Coeff Reduced
    */
-  extinction_coeff_reduced: number;
+  extinction_coeff_reduced?: number | null;
   /**
    * Extinction Coeff Oxidized
    */
-  extinction_coeff_oxidized: number;
+  extinction_coeff_oxidized?: number | null;
   /**
    * Charge At Ph7
    */
-  charge_at_ph7: number;
+  charge_at_ph7?: number | null;
   /**
    * Amino Acid Counts
    */

@@ -19,6 +19,10 @@ import {
 } from '@repo/design-system/components/ui/form';
 import { Input } from '@repo/design-system/components/ui/input';
 import { Label } from '@repo/design-system/components/ui/label';
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from '@repo/design-system/components/ui/radio-group';
 import { Separator } from '@repo/design-system/components/ui/separator';
 import { Textarea } from '@repo/design-system/components/ui/textarea';
 import { cn, handleError } from '@repo/design-system/lib/utils';
@@ -41,6 +45,7 @@ import { useTRPC } from '~/trpc/react';
 const ProteinJobSchema = z.object({
   title: z.string().min(1, { message: 'Job title is required' }),
   sequences: z.string().optional(),
+  analysisType: z.enum(['basic', 'advanced']),
 });
 
 type ProteinJob = z.infer<typeof ProteinJobSchema>;
@@ -151,18 +156,23 @@ export function ProteinForm() {
     defaultValues: {
       title: '',
       sequences: '',
+      analysisType: 'basic',
     },
   });
 
   // Watch form values for validation
   const title = useWatch({ control: form.control, name: 'title' });
   const sequences = useWatch({ control: form.control, name: 'sequences' });
+  const _analysisType = useWatch({
+    control: form.control,
+    name: 'analysisType',
+  });
 
   // Check if form is valid for submission
   const hasValidTitle = title && title.trim().length > 0;
   const hasSequences = sequences && sequences.trim().length > 0;
   const hasFile = file && file.file instanceof File;
-  const isFormValid = hasValidTitle && (hasSequences || hasFile);
+  const _isFormValid = hasValidTitle && (hasSequences || hasFile);
 
   const createMutation = useMutation(
     trpc.job.createWithSequences.mutationOptions({
@@ -229,6 +239,7 @@ export function ProteinForm() {
         title: data.title,
         algorithm: 'biopython-1.85',
         sequences: parsedSequences,
+        analysisType: data.analysisType,
       });
     } catch (error) {
       handleError(error);
@@ -397,15 +408,55 @@ export function ProteinForm() {
                   )}
                 </div>
               </div>
+
+              <FormField
+                control={form.control}
+                name="analysisType"
+                render={({ field }) => (
+                  <FormItem>
+                    <fieldset className="space-y-4">
+                      <legend className="font-medium text-foreground text-sm leading-none">
+                        Analysis Type
+                      </legend>
+                      <FormControl>
+                        <RadioGroup
+                          className="flex flex-wrap gap-2"
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <div className="relative flex flex-col items-start gap-4 rounded-md border border-input p-3 shadow-xs outline-none has-data-[state=checked]:border-primary/50">
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                className="after:absolute after:inset-0"
+                                id="basic"
+                                value="basic"
+                              />
+                              <Label htmlFor="basic">Basic</Label>
+                            </div>
+                          </div>
+                          <div className="relative flex flex-col items-start gap-4 rounded-md border border-input p-3 shadow-xs outline-none has-data-[state=checked]:border-primary/50">
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                className="after:absolute after:inset-0"
+                                id="advanced"
+                                value="advanced"
+                              />
+                              <Label htmlFor="advanced">Advanced</Label>
+                            </div>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                    </fieldset>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <Separator />
 
             <div className="flex justify-end">
-              <Button
-                disabled={!isFormValid || createMutation.isPending}
-                type="submit"
-              >
+              <Button disabled={createMutation.isPending} type="submit">
                 {createMutation.isPending
                   ? 'Creating Job...'
                   : 'Create Job & Start Analysis'}

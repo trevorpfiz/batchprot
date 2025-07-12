@@ -16,7 +16,7 @@ import {
 } from '@repo/design-system/components/ui/tabs';
 import { Settings, User } from 'lucide-react';
 import { useShallow } from 'zustand/react/shallow';
-
+import { AccountTab } from '~/components/settings/account-tab';
 import { GeneralTab } from '~/components/settings/general-tab';
 import { useSettingsDialogStore } from '~/providers/settings-dialog-store-provider';
 
@@ -77,7 +77,9 @@ export function SettingsDialog() {
               <TabsContent className="m-0" value="general">
                 <GeneralTab />
               </TabsContent>
-              <TabsContent className="m-0" value="account" />
+              <TabsContent className="m-0" value="account">
+                <AccountTab />
+              </TabsContent>
             </div>
           </Tabs>
         </div>

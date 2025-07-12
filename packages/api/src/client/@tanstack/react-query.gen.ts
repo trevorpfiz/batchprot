@@ -80,6 +80,7 @@ export const analysisRunAnalysisQueryKey = (
 /**
  * Run Analysis
  * Run protein analysis on a list of sequences.
+ * Supports both basic and advanced analysis types.
  */
 export const analysisRunAnalysisOptions = (
   options: Options<AnalysisRunAnalysisData>
@@ -101,6 +102,7 @@ export const analysisRunAnalysisOptions = (
 /**
  * Run Analysis
  * Run protein analysis on a list of sequences.
+ * Supports both basic and advanced analysis types.
  */
 export const analysisRunAnalysisMutation = (
   options?: Partial<Options<AnalysisRunAnalysisData>>

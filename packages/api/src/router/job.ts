@@ -14,6 +14,7 @@ import { protectedProcedure } from '../trpc';
 const createJobWithSequencesSchema = z.object({
   title: z.string().min(1).max(256),
   algorithm: z.string().optional(),
+  analysisType: z.enum(['basic', 'advanced']).default('basic'),
   sequences: z.array(z.string()).min(1),
 });
 
@@ -74,13 +75,14 @@ export const jobRouter = {
     .mutation(async ({ ctx, input }) => {
       const { db, session } = ctx;
       const user = session.user;
-      const { title, algorithm, sequences } = input;
+      const { title, algorithm, analysisType, sequences } = input;
 
       const [job] = await db
         .insert(Job)
         .values({
           title,
           algorithm,
+          analysisType,
           userId: user.id,
           status: 'queued',
         })
@@ -151,4 +153,16 @@ export const jobRouter = {
 
       return { job };
     }),
+
+  deleteAll: protectedProcedure.mutation(async ({ ctx }) => {
+    const { db, session } = ctx;
+    const user = session.user;
+
+    const deletedJobs = await db
+      .delete(Job)
+      .where(eq(Job.userId, user.id))
+      .returning();
+
+    return { deletedJobs };
+  }),
 } satisfies TRPCRouterRecord;

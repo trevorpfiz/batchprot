@@ -45,6 +45,7 @@ export const zHealthCheckResponse = z.object({
  */
 export const zProteinAnalysisRequest = z.object({
   sequences: z.array(z.string()),
+  analysis_type: z.string().optional().default('basic'),
 });
 
 /**
@@ -54,16 +55,16 @@ export const zProteinAnalysisResult = z.object({
   sequence: z.string(),
   length: z.number().int(),
   molecular_weight: z.number(),
-  aromaticity: z.number(),
-  instability_index: z.number(),
-  gravy: z.number(),
   isoelectric_point: z.number(),
-  helix_fraction: z.number(),
-  turn_fraction: z.number(),
-  sheet_fraction: z.number(),
-  extinction_coeff_reduced: z.number().int(),
-  extinction_coeff_oxidized: z.number().int(),
-  charge_at_ph7: z.number(),
+  aromaticity: z.union([z.number(), z.null()]).optional(),
+  instability_index: z.union([z.number(), z.null()]).optional(),
+  gravy: z.union([z.number(), z.null()]).optional(),
+  helix_fraction: z.union([z.number(), z.null()]).optional(),
+  turn_fraction: z.union([z.number(), z.null()]).optional(),
+  sheet_fraction: z.union([z.number(), z.null()]).optional(),
+  extinction_coeff_reduced: z.union([z.number().int(), z.null()]).optional(),
+  extinction_coeff_oxidized: z.union([z.number().int(), z.null()]).optional(),
+  charge_at_ph7: z.union([z.number(), z.null()]).optional(),
   amino_acid_counts: z.object({}),
   amino_acid_percentages: z.object({}),
 });
