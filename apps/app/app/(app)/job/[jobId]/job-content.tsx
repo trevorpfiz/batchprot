@@ -363,7 +363,9 @@ export function JobContent({ jobId }: JobContentProps) {
             </div>
             <div>
               <span className="font-semibold">Created:</span>{' '}
-              {new Date(jobData.job.createdAt).toLocaleDateString()}
+              {`${new Date(jobData.job.createdAt).toLocaleString()} (${new Date(
+                jobData.job.createdAt
+              ).toISOString()})`}
             </div>
           </div>
         </CardContent>
