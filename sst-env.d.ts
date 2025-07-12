@@ -19,6 +19,7 @@ declare module "sst" {
       "username": string
     }
     "MyVpc": {
+      "bastion": string
       "type": "sst.aws.Vpc"
     }
     "MyWeb": {

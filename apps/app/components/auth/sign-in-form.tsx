@@ -17,17 +17,16 @@ import { SignInSchema } from '@repo/validators/auth';
 import { ArrowRight } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
+import { Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormError } from '~/components/auth/form-error';
 import { signInWithPassword } from '~/lib/actions/auth';
 
-export const SignInForm = () => {
-  const searchParams = useSearchParams();
-  const urlError =
-    searchParams.get('error') === 'OAuthAccountNotLinked'
-      ? 'Email already in use with different provider'
-      : '';
+interface SignInFormProps {
+  urlError?: string;
+}
 
+const SignInFormInner = ({ urlError = '' }: SignInFormProps) => {
   const form = useForm<SignIn>({
     resolver: zodResolver(SignInSchema),
     defaultValues: {
@@ -115,5 +114,23 @@ export const SignInForm = () => {
         </Button>
       </form>
     </Form>
+  );
+};
+
+const SignInFormWithParams = () => {
+  const searchParams = useSearchParams();
+  const urlError =
+    searchParams.get('error') === 'OAuthAccountNotLinked'
+      ? 'Email already in use with different provider'
+      : '';
+
+  return <SignInFormInner urlError={urlError} />;
+};
+
+export const SignInForm = () => {
+  return (
+    <Suspense fallback={<SignInFormInner />}>
+      <SignInFormWithParams />
+    </Suspense>
   );
 };

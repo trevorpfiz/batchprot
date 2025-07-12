@@ -18,7 +18,7 @@ const baseUrl = getBaseUrl();
 const authConfig: AuthConfig = {
   baseUrl,
   productionUrl: `https://${env.NEXT_PUBLIC_APP_URL ?? 'batchprot.com'}`,
-  secret: env.AUTH_SECRET,
+  secret: env.BETTER_AUTH_SECRET,
   githubClientId: env.AUTH_GITHUB_ID,
   githubClientSecret: env.AUTH_GITHUB_SECRET,
 };

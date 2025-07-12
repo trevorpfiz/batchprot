@@ -45,6 +45,18 @@
     "studio": {
       "cache": false,
       "persistent": true
+    },
+    "migrate:prod": {
+      "cache": false,
+      "interactive": true
+    },
+    "push:prod": {
+      "cache": false,
+      "interactive": true
+    },
+    "studio:prod": {
+      "cache": false,
+      "interactive": true
     }
   }
 }

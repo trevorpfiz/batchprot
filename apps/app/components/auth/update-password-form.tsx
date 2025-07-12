@@ -17,7 +17,7 @@ import { UpdatePasswordSchema } from '@repo/validators/auth';
 import { ArrowRight, Check, Eye, EyeOff, X } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { useAction } from 'next-safe-action/hooks';
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FormError } from '~/components/auth/form-error';
 import { FormSuccess } from '~/components/auth/form-success';
@@ -30,17 +30,18 @@ const PASSWORD_REQUIREMENTS = [
   { regex: /[A-Z]/, text: 'At least 1 uppercase letter' },
 ] as const;
 
-export const UpdatePasswordForm = () => {
-  const searchParams = useSearchParams();
-  const token = searchParams.get('token');
+interface UpdatePasswordFormProps {
+  token?: string;
+}
 
+const UpdatePasswordFormInner = ({ token = '' }: UpdatePasswordFormProps) => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
 
   const form = useForm<UpdatePassword>({
     resolver: zodResolver(UpdatePasswordSchema),
     defaultValues: {
       newPassword: '',
-      token: token ?? '',
+      token,
     },
   });
 
@@ -219,5 +220,20 @@ export const UpdatePasswordForm = () => {
         </Button>
       </form>
     </Form>
+  );
+};
+
+const UpdatePasswordFormWithParams = () => {
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
+
+  return <UpdatePasswordFormInner token={token ?? ''} />;
+};
+
+export const UpdatePasswordForm = () => {
+  return (
+    <Suspense fallback={<UpdatePasswordFormInner />}>
+      <UpdatePasswordFormWithParams />
+    </Suspense>
   );
 };

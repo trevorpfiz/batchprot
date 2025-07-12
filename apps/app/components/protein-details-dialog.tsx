@@ -205,7 +205,7 @@ export function ProteinDetailsDialog() {
                 <div className="rounded bg-gray-50 p-4">
                   <p className="font-medium text-gray-800">Reduced Cysteine</p>
                   <p className="font-bold text-2xl text-gray-900">
-                    {protein.extinctionCoeffReduced.toLocaleString()}
+                    {protein.extinctionCoeffReduced?.toLocaleString()}
                   </p>
                   <p className="text-gray-600 text-xs">M⁻¹cm⁻¹ at 280nm</p>
                   <p className="mt-1 text-gray-500 text-xs">
@@ -215,7 +215,7 @@ export function ProteinDetailsDialog() {
                 <div className="rounded bg-gray-50 p-4">
                   <p className="font-medium text-gray-800">Oxidized Cysteine</p>
                   <p className="font-bold text-2xl text-gray-900">
-                    {protein.extinctionCoeffOxidized.toLocaleString()}
+                    {protein.extinctionCoeffOxidized?.toLocaleString()}
                   </p>
                   <p className="text-gray-600 text-xs">M⁻¹cm⁻¹ at 280nm</p>
                   <p className="mt-1 text-gray-500 text-xs">

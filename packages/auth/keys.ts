@@ -6,7 +6,7 @@ export const keys = () =>
     server: {
       AUTH_GITHUB_ID: z.string().min(1),
       AUTH_GITHUB_SECRET: z.string().min(1),
-      AUTH_SECRET:
+      BETTER_AUTH_SECRET:
         process.env.NODE_ENV === 'production'
           ? z.string().min(1)
           : z.string().min(1).optional(),
@@ -15,7 +15,7 @@ export const keys = () =>
     runtimeEnv: {
       AUTH_GITHUB_ID: process.env.AUTH_GITHUB_ID,
       AUTH_GITHUB_SECRET: process.env.AUTH_GITHUB_SECRET,
-      AUTH_SECRET: process.env.AUTH_SECRET,
+      BETTER_AUTH_SECRET: process.env.BETTER_AUTH_SECRET,
       NODE_ENV: process.env.NODE_ENV,
     },
   });
