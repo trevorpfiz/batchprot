@@ -33,7 +33,7 @@
     "start:db": "./start-database.sh",
     "test": "turbo test",
     "tunnel:prod": "sst tunnel --stage production",
-    "mfa:update": "./mfa.sh"
+    "sso": "aws sso login --sso-session=bioacc"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
@@ -41,14 +41,14 @@
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.4",
     "@types/aws-lambda": "8.10.150",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.13",
     "commander": "^14.0.0",
     "husky": "^9.1.7",
     "sst": "3.17.10",
     "tsup": "^8.5.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "ultracite": "^5.0.32",
+    "ultracite": "^5.0.35",
     "vitest": "^3.2.4"
   }
 }

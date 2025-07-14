@@ -65,7 +65,8 @@ export default $config({
       providers: {
         aws: {
           region: 'us-east-2',
-          profile: input.stage === 'production' ? 'mfa' : 'mfa',
+          profile:
+            input.stage === 'production' ? 'bioacc-production' : 'bioacc-dev',
         },
       },
     };

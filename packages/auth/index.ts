@@ -28,10 +28,18 @@ export function initAuth(options: AuthConfig) {
       enabled: true,
     },
     plugins: [
-      bearer(),
+      bearer({
+        requireSignature: true,
+      }),
       jwt({
         jwt: {
           expirationTime: '1y',
+        },
+        jwks: {
+          keyPairConfig: {
+            alg: 'EdDSA',
+            crv: 'Ed25519',
+          },
         },
       }),
       nextCookies(), // Must be last plugin for Next.js cookie handling
