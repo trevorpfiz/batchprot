@@ -32,7 +32,8 @@
     "migrate:prod": "sst shell --stage production drizzle-kit migrate",
     "push:prod": "sst shell --stage production drizzle-kit push",
     "studio:prod": "sst shell --stage production drizzle-kit studio",
-    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "generate-dbml": "tsx generate-dbml.ts"
   },
   "dependencies": {
     "@t3-oss/env-nextjs": "^0.13.8",
@@ -46,7 +47,9 @@
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^24.0.13",
     "@types/pg": "^8.15.4",
+    "drizzle-dbml-generator": "^0.10.0",
     "drizzle-kit": "^0.31.4",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }

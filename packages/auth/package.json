@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "@repo/database": "workspace:*",
+    "@repo/logger": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
     "better-auth": "^1.2.12",
     "next": "15.3.5",

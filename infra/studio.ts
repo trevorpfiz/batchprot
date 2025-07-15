@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/noUndeclaredVariables: sst */
 import { rds } from './rds.js';
 
 // Create Drizzle Studio dev command

@@ -8,7 +8,7 @@ import { env } from '~/env';
 
 const getBaseUrl = () => {
   if (env.NODE_ENV === 'production') {
-    return `https://${env.NEXT_PUBLIC_APP_URL}`;
+    return `${env.NEXT_PUBLIC_APP_URL}`;
   }
   return 'http://localhost:3000';
 };
