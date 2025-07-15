@@ -31,7 +31,7 @@ export function AccountTab() {
   return (
     <div className="flex flex-col gap-3 pt-5 pr-6 pb-6 pl-0 text-foreground text-sm">
       <div className="flex items-center justify-between border-border border-b pb-3">
-        <p className="text-base">Delete all chats</p>
+        <p className="text-base">Delete all jobs</p>
         <Button
           className="rounded-full text-destructive hover:text-destructive-foreground"
           disabled={deleteAllJobsMutation.isPending}
