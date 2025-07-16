@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/correctness/noUndeclaredVariables: sst */
 import { vpc } from './vpc.js';
 
 export const rds = new sst.aws.Postgres('MyPostgres', {

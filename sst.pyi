@@ -18,6 +18,7 @@ class Resource:
         type: str
         username: str
     class MyVpc:
+        bastion: str
         type: str
     class MyWeb:
         type: str

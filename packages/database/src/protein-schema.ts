@@ -14,6 +14,8 @@ export const jobStatus = pgEnum('job_status', [
   'failed',
 ]);
 
+export const analysisType = pgEnum('analysis_type', ['basic', 'advanced']);
+
 // Job table for batch protein analysis
 export const Job = createTable(
   'job',
@@ -26,6 +28,7 @@ export const Job = createTable(
     title: t.varchar({ length: 256 }).notNull(),
     status: jobStatus('job_status').default('queued').notNull(),
     algorithm: t.varchar({ length: 64 }).default('biopython-1.85'),
+    analysisType: analysisType('analysis_type').default('basic').notNull(),
 
     createdAt: t.timestamp().defaultNow().notNull(),
     updatedAt: t
@@ -59,18 +62,20 @@ export const ProteinAnalysis = createTable(
     sequence: t.text().notNull(),
     length: t.integer().notNull(),
 
-    /* searchable scalar metrics */
+    /* searchable scalar metrics - basic analysis */
     molecularWeight: t.numeric({ precision: 10, scale: 2 }).notNull(),
-    aromaticity: t.numeric({ precision: 5, scale: 3 }).notNull(),
-    instabilityIndex: t.numeric({ precision: 5, scale: 2 }).notNull(),
-    gravy: t.numeric({ precision: 5, scale: 2 }).notNull(),
     isoelectricPoint: t.numeric({ precision: 4, scale: 2 }).notNull(),
-    helixFraction: t.numeric({ precision: 4, scale: 2 }).notNull(),
-    turnFraction: t.numeric({ precision: 4, scale: 2 }).notNull(),
-    sheetFraction: t.numeric({ precision: 4, scale: 2 }).notNull(),
-    extinctionCoeffReduced: t.integer().notNull(),
-    extinctionCoeffOxidized: t.integer().notNull(),
-    chargeAtPh7: t.numeric({ precision: 6, scale: 2 }).notNull(),
+
+    /* advanced analysis metrics - nullable for basic analysis */
+    aromaticity: t.numeric({ precision: 5, scale: 3 }),
+    instabilityIndex: t.numeric({ precision: 5, scale: 2 }),
+    gravy: t.numeric({ precision: 5, scale: 2 }),
+    helixFraction: t.numeric({ precision: 4, scale: 2 }),
+    turnFraction: t.numeric({ precision: 4, scale: 2 }),
+    sheetFraction: t.numeric({ precision: 4, scale: 2 }),
+    extinctionCoeffReduced: t.integer(),
+    extinctionCoeffOxidized: t.integer(),
+    chargeAtPh7: t.numeric({ precision: 6, scale: 2 }),
 
     /* flexible payload */
     result: t
@@ -173,6 +178,7 @@ export type NewJobParams = z.infer<typeof insertJobParams>;
 export type UpdateJobParams = z.infer<typeof updateJobSchema>;
 export type JobId = Job['id'];
 export type JobStatus = (typeof jobStatus.enumValues)[number];
+export type AnalysisType = (typeof analysisType.enumValues)[number];
 
 export type ProteinAnalysis = typeof ProteinAnalysis.$inferSelect;
 export type NewProteinAnalysis = typeof ProteinAnalysis.$inferInsert;

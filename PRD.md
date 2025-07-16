@@ -11,7 +11,6 @@ The bioinformatics landscape is filled with a fragmented set of tools that are t
 3. Results are saved to the database for a user account.
 4. Results can be exported in a CSV report.
 
-
 ## Technical Notes
 
 Analyzing protein sequences with the ProtParam module.
@@ -164,7 +163,7 @@ Edge: The central amino acid of the window always has a weight of 1. By default,
 
 The method returns a list of values which can be plotted to view the change along a protein sequence. Many scales exist. Just add your favorites to the ProtParamData modules.
 
-Similar to expasy’s ProtScale: http://www.expasy.org/cgi-bin/protscale.pl
+Similar to expasy’s ProtScale: <http://www.expasy.org/cgi-bin/protscale.pl>
 
 isoelectric_point(self)
 Calculate the isoelectric point.
@@ -189,4 +188,3 @@ Calculate the molar extinction coefficient.
 Calculates the molar extinction coefficient assuming cysteines (reduced) and cystines residues (Cys-Cys-bond)
 
 ---
-

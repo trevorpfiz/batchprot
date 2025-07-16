@@ -27,6 +27,9 @@ def run_analysis(
 ):
     """
     Run protein analysis on a list of sequences.
+    Supports both basic and advanced analysis types.
     """
-    results = analyze_protein_sequences(analysis_request.sequences)
+    results = analyze_protein_sequences(
+        analysis_request.sequences, analysis_request.analysis_type
+    )
     return ProteinAnalysisResponse(results=results)

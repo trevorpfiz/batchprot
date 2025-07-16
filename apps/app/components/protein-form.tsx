@@ -19,6 +19,10 @@ import {
 } from '@repo/design-system/components/ui/form';
 import { Input } from '@repo/design-system/components/ui/input';
 import { Label } from '@repo/design-system/components/ui/label';
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from '@repo/design-system/components/ui/radio-group';
 import { Separator } from '@repo/design-system/components/ui/separator';
 import { Textarea } from '@repo/design-system/components/ui/textarea';
 import { cn, handleError } from '@repo/design-system/lib/utils';
@@ -34,12 +38,14 @@ import { useId } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 import { formatBytes, useFileUpload } from '~/hooks/use-file-upload';
+import { useProteinAnalysisStore } from '~/providers/protein-analysis-store-provider';
 import { useTRPC } from '~/trpc/react';
 
 // Local validation schema
 const ProteinJobSchema = z.object({
   title: z.string().min(1, { message: 'Job title is required' }),
   sequences: z.string().optional(),
+  analysisType: z.enum(['basic', 'advanced']),
 });
 
 type ProteinJob = z.infer<typeof ProteinJobSchema>;
@@ -61,21 +67,68 @@ const validateProteinJobSubmission = (
   return { isValid: true };
 };
 
+// Helper function to parse FASTA sequences
+const parseFastaSequences = (text: string): string[] => {
+  const lines = text.trim().split('\n');
+  const sequences: string[] = [];
+  let currentSequence = '';
+
+  for (const line of lines) {
+    if (line.startsWith('>')) {
+      if (currentSequence) {
+        sequences.push(currentSequence.replace(/\s/g, ''));
+        currentSequence = '';
+      }
+    } else {
+      currentSequence += line.trim();
+    }
+  }
+
+  if (currentSequence) {
+    sequences.push(currentSequence.replace(/\s/g, ''));
+  }
+
+  return sequences.filter((seq) => seq.length > 0);
+};
+
 // Example protein sequences
-const EXAMPLE_SEQUENCES = `>sp|P04637|P53_HUMAN Cellular tumor antigen p53 OS=Homo sapiens OX=9606 GN=TP53 PE=1 SV=4
-MEEPQSDPSVEPPLSQETFSDLWKLLPENNVLSPLPSQAMDDLMLSPDDIEQWFTEDPGPDEAPRMPEAAPPVAPAPAAPTPAAPAPAPSWPLSSSVPSQKTYQGSYGFRLGFLHSGTAKSVTCTYSPALNKMFCQLAKTCPVQLWVDSTPPPGTRVRAMAIYKQSQHMTEVVRRCPHHERCSDSDGLAPPQHLIRVEGNLRVEYLDDRNTFRHSVVVPYEPPEVGSDCTTIHYNYMCNSSCMGGMNRRPILTIITLEDSSGNLLGRNSFEVRVCACPGRDRRTEEENLRKKGEPHHELPPGSTKRALPNNTSSSPQPKKKPLDGEYFTLQIRGRERFEMFRELNEALELKDAQAGKEPGGSRAHSSHLKSKKGQSTSRHKKLMFKTEGPDSD
+const EXAMPLE_SEQUENCES = `>sp|P43238|ALL12_ARAHY Allergen Ara h 1, clone P41B OS=Arachis hypogaea OX=3818 PE=1 SV=1
+MRGRVSPLMLLLGILVLASVSATHAKSSPYQKKTENPCAQRCLQSCQQEPDDLKQKACES
+RCTKLEYDPRCVYDPRGHTGTTNQRSPPGERTRGRQPGDYDDDRRQPRREEGGRWGPAGP
+REREREEDWRQPREDWRRPSHQQPRKIRPEGREGEQEWGTPGSHVREETSRNNPFYFPSR
+RFSTRYGNQNGRIRVLQRFDQRSRQFQNLQNHRIVQIEAKPNTLVLPKHADADNILVIQQ
+GQATVTVANGNNRKSFNLDEGHALRIPSGFISYILNRHDNQNLRVAKISMPVNTPGQFED
+FFPASSRDQSSYLQGFSRNTLEAAFNAEFNEIRRVLLEENAGGEQEERGQRRWSTRSSEN
+NEGVIVKVSKEHVEELTKHAKSVSKKGSEEEGDITNPINLREGEPDLSNNFGKLFEVKPD
+KKNPQLQDLDMMLTCVEIKEGALMLPHFNSKAMVIVVVNKGTGNLELVAVRKEQQQRGRR
+EEEEDEDEEEEGSNREVRRYTARLKEGDVFIMPAAHPVAINASSELHLLGFGINAENNHR
+IFLAGDKDNVIDQIEKQAKDLAFPGSGEQVEKLIKNQKESHFVSARPQSQSQSPSSPEKE
+SPEKEDQEEENQGGKGPLLSILKAFN
 
->sp|P01308|INS_HUMAN Insulin OS=Homo sapiens OX=9606 GN=INS PE=1 SV=1
-MALWMRLLPLLALLALWGPDPAAAFVNQHLCGSHLVEALYLVCGERGFFYTPKTRREAEDLQVGQVELGGGPGAGSLQPLALEGSLQKRGIVEQCCTSICSLYQLENYCN
+>sp|Q6PSU2|CONG7_ARAHY Conglutin-7 OS=Arachis hypogaea OX=3818 PE=1 SV=2
+MAKLTILVALALFLLAAHASARQQWELQGDRRCQSQLERANLRPCEQHLMQKIQRDEDSY
+GRDPYSPSQDPYSPSQDPDRRDPYSPSPYDRRGAGSSQHQERCCNELNEFENNQRCMCEA
+LQQIMENQSDRLQGRQQEQQFKRELRNLPQQCGLRAPQRCDLEVESGGRDRY
 
->sp|P68871|HBB_HUMAN Hemoglobin subunit beta OS=Homo sapiens OX=9606 GN=HBB PE=1 SV=2
-MVHLTPEEKSAVTALWGKVNVDEVGGEALGRLLVVYPWTQRFFESFGDLSTPDAVMGNPKVKAHGKKVLGAFSDGLAHLDNLKGTFATLSELHCDKLHVDPENFRLLGNVLVCVLAHHFGKEFTPPVQAAYQKVVAGVANALAHKYH`;
+>tr|O82580|O82580_ARAHY Glycinin (Fragment) OS=Arachis hypogaea OX=3818 GN=Arah3 PE=2 SV=1
+RQQPEENACQFQRLNAQRPDNRIESEGGYIETWNPNNQEFECAGVALSRLVLRRNALRRP
+FYSNAPQEIFIQQGRGYFGLIFPGCPRHYEEPHTQGRRSQSQRPPRRLQGEDQSQQQRDS
+HQKVHRFDEGDLIAVPTGVAFWLYNDHDTDVVAVSLTDTNNNDNQLDQFPRRFNLAGNTE
+QEFLRYQQQSRQSRRRSLPYSPYSPQSQPRQEEREFSPRGQHSRRERAGQEEENEGGNIF
+SGFTPEFLEQAFQVDDRQIVQNLRGETESEEEGAIVTVRGGLRILSPDRKRRADEEEEYD
+EDEYEYDEEDRRRGRGSRGRGNGIEETICTASAKKNIGRNRSPDIYNPQAGSLKTANDLN
+LLILRWLGPSAEYGNLYRNALFVAHYNTNAHSIIYRLRGRAHVQVVDSNGNRVYDEELQE
+GHVLVVPQNFAVAGKSQSENFEYVAFKTDSRPSIANLAGENSVIDNLPEEVVANSYGLQR
+EQARQLKNNNPFKFFVPPSQQSPRAVA`;
 
 export function ProteinForm() {
   const router = useRouter();
   const trpc = useTRPC();
   const queryClient = useQueryClient();
   const textareaId = useId();
+
+  // Use protein analysis store
+  const setSequences = useProteinAnalysisStore((state) => state.setSequences);
 
   const maxSize = 10 * 1024 * 1024; // 10MB default
 
@@ -103,24 +156,31 @@ export function ProteinForm() {
     defaultValues: {
       title: '',
       sequences: '',
+      analysisType: 'basic',
     },
   });
 
   // Watch form values for validation
   const title = useWatch({ control: form.control, name: 'title' });
   const sequences = useWatch({ control: form.control, name: 'sequences' });
+  const _analysisType = useWatch({
+    control: form.control,
+    name: 'analysisType',
+  });
 
   // Check if form is valid for submission
   const hasValidTitle = title && title.trim().length > 0;
   const hasSequences = sequences && sequences.trim().length > 0;
   const hasFile = file && file.file instanceof File;
-  const isFormValid = hasValidTitle && (hasSequences || hasFile);
+  const _isFormValid = hasValidTitle && (hasSequences || hasFile);
 
   const createMutation = useMutation(
-    trpc.job.create.mutationOptions({
+    trpc.job.createWithSequences.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries({ queryKey: trpc.job.byUser.queryKey() });
         if (data.job) {
+          // Store sequences in zustand store instead of sessionStorage
+          setSequences(data.job.id, data.sequences);
           router.push(`/job/${data.job.id}`);
         }
       },
@@ -154,19 +214,32 @@ export function ProteinForm() {
         return;
       }
 
-      let _sequencesText = '';
+      let sequencesText = '';
 
       // If a file is provided, use it instead of textarea content
       if (file && file.file instanceof File) {
-        _sequencesText = await handleFileRead(file.file);
+        sequencesText = await handleFileRead(file.file);
       } else if (data.sequences) {
-        _sequencesText = data.sequences;
+        sequencesText = data.sequences;
       }
 
+      // Parse sequences for validation
+      const parsedSequences = parseFastaSequences(sequencesText);
+
+      if (parsedSequences.length === 0) {
+        form.setError('sequences', {
+          type: 'manual',
+          message: 'No valid protein sequences found. Please check your input.',
+        });
+        return;
+      }
+
+      // Create job with sequences
       createMutation.mutate({
         title: data.title,
-        // For now, we'll just create the job with the title
-        // Later we can add the sequences to the job creation
+        algorithm: 'biopython-1.85',
+        sequences: parsedSequences,
+        analysisType: data.analysisType,
       });
     } catch (error) {
       handleError(error);
@@ -183,7 +256,8 @@ export function ProteinForm() {
         <CardTitle>Protein Analysis Job</CardTitle>
         <CardDescription>
           Enter protein sequences directly or upload a FASTA file to start your
-          analysis
+          analysis. The job will be created immediately and analysis will begin
+          in the background.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -334,16 +408,58 @@ export function ProteinForm() {
                   )}
                 </div>
               </div>
+
+              <FormField
+                control={form.control}
+                name="analysisType"
+                render={({ field }) => (
+                  <FormItem>
+                    <fieldset className="space-y-4">
+                      <legend className="font-medium text-foreground text-sm leading-none">
+                        Analysis Type
+                      </legend>
+                      <FormControl>
+                        <RadioGroup
+                          className="flex flex-wrap gap-2"
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <div className="relative flex flex-col items-start gap-4 rounded-md border border-input p-3 shadow-xs outline-none has-data-[state=checked]:border-primary/50">
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                className="after:absolute after:inset-0"
+                                id="basic"
+                                value="basic"
+                              />
+                              <Label htmlFor="basic">Basic</Label>
+                            </div>
+                          </div>
+                          <div className="relative flex flex-col items-start gap-4 rounded-md border border-input p-3 shadow-xs outline-none has-data-[state=checked]:border-primary/50">
+                            <div className="flex items-center gap-2">
+                              <RadioGroupItem
+                                className="after:absolute after:inset-0"
+                                id="advanced"
+                                value="advanced"
+                              />
+                              <Label htmlFor="advanced">Advanced</Label>
+                            </div>
+                          </div>
+                        </RadioGroup>
+                      </FormControl>
+                    </fieldset>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
             <Separator />
 
             <div className="flex justify-end">
-              <Button
-                disabled={!isFormValid || createMutation.isPending}
-                type="submit"
-              >
-                {createMutation.isPending ? 'Creating Job...' : 'Create Job'}
+              <Button disabled={createMutation.isPending} type="submit">
+                {createMutation.isPending
+                  ? 'Creating Job...'
+                  : 'Create Job & Start Analysis'}
               </Button>
             </div>
           </form>

@@ -21,15 +21,19 @@
     "db:pull": "turbo -F @repo/database pull",
     "db:push": "turbo -F @repo/database push",
     "db:studio": "turbo -F @repo/database studio",
-    "deploy": "sst deploy --stage production",
     "dev": "sst dev",
+    "db:migrate:prod": "turbo -F @repo/database migrate:prod",
+    "db:push:prod": "turbo -F @repo/database push:prod",
+    "db:studio:prod": "turbo -F @repo/database studio:prod",
+    "sst:deploy": "sst deploy --stage production",
     "format": "ultracite format",
     "lint": "ultracite lint",
     "lint:ws": "pnpm dlx sherif@latest",
     "postinstall": "pnpm lint:ws",
     "start:db": "./start-database.sh",
     "test": "turbo test",
-    "mfa:update": "./mfa.sh"
+    "tunnel:prod": "sst tunnel --stage production",
+    "sso": "aws sso login --sso-session=bioacc"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",
@@ -37,14 +41,14 @@
     "@repo/typescript-config": "workspace:*",
     "@turbo/gen": "^2.5.4",
     "@types/aws-lambda": "8.10.150",
-    "@types/node": "^24.0.12",
+    "@types/node": "^24.0.13",
     "commander": "^14.0.0",
     "husky": "^9.1.7",
     "sst": "3.17.10",
     "tsup": "^8.5.0",
     "turbo": "^2.5.4",
     "typescript": "^5.8.3",
-    "ultracite": "^5.0.32",
+    "ultracite": "^5.0.35",
     "vitest": "^3.2.4"
   }
 }

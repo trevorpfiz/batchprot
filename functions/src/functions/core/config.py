@@ -1,17 +1,8 @@
 import secrets
-from typing import Annotated, Any, List, Literal
+from typing import List, Literal
 
-from pydantic import AnyHttpUrl, BeforeValidator, computed_field
+from pydantic import AnyHttpUrl, TypeAdapter, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
-
-
-def parse_cors(v: Any) -> List[str] | str:
-    """A validator to parse a comma-separated string of CORS origins into a list."""
-    if isinstance(v, str) and not v.startswith("["):
-        return [i.strip() for i in v.split(",")]
-    if isinstance(v, (list, str)):
-        return v
-    raise ValueError(v)
 
 
 class Settings(BaseSettings):
@@ -29,7 +20,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     SECRET_KEY: str = secrets.token_urlsafe(32)
 
-    ENVIRONMENT: Literal["dev", "prod"] = "dev"
+    ENVIRONMENT: Literal["dev", "production"] = "dev"
 
     AUTH_BASE_URL: AnyHttpUrl = "http://localhost:3000"
 
@@ -39,13 +30,27 @@ class Settings(BaseSettings):
         """Construct the full URL to the JWKS endpoint from the base URL."""
         return f"{str(self.AUTH_BASE_URL).rstrip('/')}/api/auth/jwks"
 
-    BACKEND_CORS_ORIGINS: Annotated[List[AnyHttpUrl], BeforeValidator(parse_cors)] = []
+    BACKEND_CORS_ORIGINS: str = ""
+
+    @computed_field
+    @property
+    def PARSED_CORS_ORIGINS(self) -> List[AnyHttpUrl]:
+        """
+        Parses the comma-separated BACKEND_CORS_ORIGINS string into a list of Pydantic URLs.
+        """
+        if not self.BACKEND_CORS_ORIGINS:
+            return []
+
+        urls = [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",")]
+
+        url_list_validator = TypeAdapter(List[AnyHttpUrl])
+        return url_list_validator.validate_python(urls)
 
     @computed_field
     @property
     def CORS_ORIGINS_STR(self) -> List[str]:
         """Return the CORS origins as a list of strings for the middleware."""
-        return [str(origin).rstrip("/") for origin in self.BACKEND_CORS_ORIGINS]
+        return [str(origin).rstrip("/") for origin in self.PARSED_CORS_ORIGINS]
 
 
 settings = Settings()

@@ -29,13 +29,22 @@ export const signInWithPassword = actionClient
       });
 
       revalidatePath('/', 'layout');
-      redirect('/');
     } catch (error) {
       if (error instanceof Error) {
+        // Handle specific Better Auth errors
+        if (error.message.includes('Invalid email or password')) {
+          throw new Error('Invalid email or password');
+        }
+        if (error.message.includes('User not found')) {
+          throw new Error('No account found with this email');
+        }
         throw new Error(error.message);
       }
-      throw new Error('An unknown error occurred.');
+      throw new Error('Authentication failed. Please try again.');
     }
+
+    // Redirect after successful authentication
+    redirect('/');
   });
 
 export const signUp = actionClient
@@ -55,13 +64,22 @@ export const signUp = actionClient
       });
 
       revalidatePath('/', 'layout');
-      redirect('/');
     } catch (error) {
       if (error instanceof Error) {
+        // Handle specific Better Auth errors
+        if (error.message.includes('User already exists')) {
+          throw new Error('An account with this email already exists');
+        }
+        if (error.message.includes('Invalid email')) {
+          throw new Error('Please enter a valid email address');
+        }
         throw new Error(error.message);
       }
-      throw new Error('An unknown error occurred.');
+      throw new Error('Account creation failed. Please try again.');
     }
+
+    // Redirect after successful registration
+    redirect('/');
   });
 
 export const requestResetPassword = actionClient
@@ -82,10 +100,22 @@ export const requestResetPassword = actionClient
       revalidatePath('/', 'layout');
     } catch (error) {
       if (error instanceof Error) {
+        // Don't reveal whether email exists for security
+        if (error.message.includes('User not found')) {
+          return {
+            success:
+              'If an account with this email exists, you will receive a reset link.',
+          };
+        }
         throw new Error(error.message);
       }
-      throw new Error('An unknown error occurred.');
+      throw new Error('Password reset request failed. Please try again.');
     }
+
+    return {
+      success:
+        'If an account with this email exists, you will receive a reset link.',
+    };
   });
 
 export const updatePassword = authActionClient
@@ -104,33 +134,58 @@ export const updatePassword = authActionClient
       });
 
       revalidatePath('/', 'layout');
-      redirect('/');
     } catch (error) {
       if (error instanceof Error) {
+        if (error.message.includes('Invalid token')) {
+          throw new Error('Reset link is invalid or has expired');
+        }
+        if (error.message.includes('Token expired')) {
+          throw new Error('Reset link has expired. Please request a new one.');
+        }
         throw new Error(error.message);
       }
-      throw new Error('An unknown error occurred.');
+      throw new Error('Password update failed. Please try again.');
     }
+
+    // Redirect after successful password update
+    redirect('/');
   });
 
 export const signInWithGithub = async () => {
-  const res = await auth.api.signInSocial({
-    body: {
-      provider: 'github',
-      callbackURL: '/',
-    },
-  });
+  try {
+    const res = await auth.api.signInSocial({
+      body: {
+        provider: 'github',
+        callbackURL: '/',
+      },
+    });
 
-  if (!res.url) {
-    throw new Error('No URL returned from signInSocial');
+    if (!res.url) {
+      throw new Error('GitHub authentication failed');
+    }
+
+    redirect(res.url);
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('GitHub authentication failed. Please try again.');
   }
-  redirect(res.url);
 };
 
 export const signOut = async () => {
-  await auth.api.signOut({
-    headers: await headers(),
-  });
-  revalidatePath('/', 'layout');
+  try {
+    await auth.api.signOut({
+      headers: await headers(),
+    });
+
+    revalidatePath('/', 'layout');
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(error.message);
+    }
+    throw new Error('Sign out failed. Please try again.');
+  }
+
   redirect('/');
 };

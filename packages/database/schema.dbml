@@ -1,0 +1,127 @@
+enum analysis_type {
+  basic
+  advanced
+}
+
+enum job_status {
+  queued
+  running
+  succeeded
+  failed
+}
+
+table prot_feedback {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  userId text [not null]
+  content text [not null]
+  createdAt timestamp [not null, default: `now()`]
+  updatedAt "timestamp with time zone"
+
+  indexes {
+    userId [name: 'feedback_user_id_idx']
+    createdAt [name: 'feedback_created_at_idx']
+  }
+}
+
+table prot_job {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  userId text [not null]
+  title varchar(256) [not null]
+  job_status job_status [not null, default: 'queued']
+  algorithm varchar(64) [default: 'biopython-1.85']
+  analysis_type analysis_type [not null, default: 'basic']
+  createdAt timestamp [not null, default: `now()`]
+  updatedAt "timestamp with time zone"
+
+  indexes {
+    (userId, createdAt) [name: 'job_user_created_idx']
+  }
+}
+
+table prot_protein_analysis {
+  id uuid [pk, not null, default: `gen_random_uuid()`]
+  jobId uuid [not null]
+  sequenceHash char(40) [not null]
+  sequence text [not null]
+  length integer [not null]
+  molecularWeight "numeric(10, 2)" [not null]
+  isoelectricPoint "numeric(4, 2)" [not null]
+  aromaticity "numeric(5, 3)"
+  instabilityIndex "numeric(5, 2)"
+  gravy "numeric(5, 2)"
+  helixFraction "numeric(4, 2)"
+  turnFraction "numeric(4, 2)"
+  sheetFraction "numeric(4, 2)"
+  extinctionCoeffReduced integer
+  extinctionCoeffOxidized integer
+  chargeAtPh7 "numeric(6, 2)"
+  result jsonb [not null, default: `'{}'::jsonb`]
+  createdAt timestamp [not null, default: `now()`]
+  updatedAt "timestamp with time zone"
+
+  indexes {
+    jobId [name: 'pa_job_idx']
+    sequenceHash [name: 'pa_seqhash_idx']
+    instabilityIndex [name: 'pa_instability_idx']
+    result [name: 'pa_result_gin_idx']
+  }
+}
+
+table prot_account {
+  id text [pk, not null]
+  accountId text [not null]
+  providerId text [not null]
+  userId text [not null]
+  accessToken text
+  refreshToken text
+  idToken text
+  accessTokenExpiresAt timestamp
+  refreshTokenExpiresAt timestamp
+  scope text
+  password text
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+table prot_jwks {
+  id text [pk, not null]
+  publicKey text [not null]
+  privateKey text [not null]
+  createdAt timestamp [not null]
+}
+
+table prot_session {
+  id text [pk, not null]
+  expiresAt timestamp [not null]
+  token text [not null, unique]
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+  ipAddress text
+  userAgent text
+  userId text [not null]
+}
+
+table prot_user {
+  id text [pk, not null]
+  name text [not null]
+  email text [not null, unique]
+  emailVerified boolean [not null]
+  image text
+  createdAt timestamp [not null]
+  updatedAt timestamp [not null]
+}
+
+table prot_verification {
+  id text [pk, not null]
+  identifier text [not null]
+  value text [not null]
+  expiresAt timestamp [not null]
+  createdAt timestamp
+  updatedAt timestamp
+}
+
+ref: prot_feedback.userId - prot_user.id
+
+ref: prot_job.userId - prot_user.id
+
+ref: prot_protein_analysis.jobId > prot_job.id

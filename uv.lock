@@ -149,6 +149,7 @@ source = { editable = "functions" }
 dependencies = [
     { name = "biopython" },
     { name = "fastapi" },
+    { name = "httpx" },
     { name = "mangum" },
     { name = "pydantic" },
     { name = "pydantic-settings" },
@@ -159,7 +160,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "httpx" },
     { name = "pytest" },
 ]
 
@@ -167,6 +167,7 @@ dev = [
 requires-dist = [
     { name = "biopython", specifier = "==1.85" },
     { name = "fastapi", specifier = "==0.116.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
     { name = "mangum", specifier = "==0.19.0" },
     { name = "pydantic", specifier = "==2.11.7" },
     { name = "pydantic-settings", specifier = "==2.10.1" },
@@ -176,10 +177,7 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
-dev = [
-    { name = "httpx", specifier = ">=0.28.1" },
-    { name = "pytest", specifier = ">=8.4.1" },
-]
+dev = [{ name = "pytest", specifier = ">=8.4.1" }]
 
 [[package]]
 name = "h11"

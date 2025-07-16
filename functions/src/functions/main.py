@@ -44,7 +44,7 @@ if settings.ENVIRONMENT == "dev":
     )
 
 # Set all CORS enabled origins
-if settings.BACKEND_CORS_ORIGINS:
+if settings.PARSED_CORS_ORIGINS:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.CORS_ORIGINS_STR,

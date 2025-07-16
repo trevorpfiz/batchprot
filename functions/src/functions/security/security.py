@@ -47,6 +47,7 @@ async def get_jwks(force_refresh: bool = False) -> list[dict[str, Any]]:
             response.raise_for_status()
             jwks_data = response.json()
             logger.debug("JWKS data received: %s", jwks_data)
+            logger.info(f"Full JWKS content: {jwks_data}")
 
             _jwks_cache = jwks_data.get("keys", [])
             _jwks_cache_expiry = datetime.now(timezone.utc) + timedelta(

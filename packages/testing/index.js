@@ -1,5 +1,5 @@
 'use strict';
-const path = require('node:path');
+
 const react = require('@vitejs/plugin-react');
 const { defineConfig } = require('vitest/config');
 
@@ -8,12 +8,7 @@ const config = defineConfig({
   test: {
     environment: 'jsdom',
   },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './'),
-      '@repo': path.resolve(__dirname, '../../packages'),
-    },
-  },
+  // Aliases are now handled by vite-tsconfig-paths in each app's vitest.config.ts
 });
 
 module.exports = config;
